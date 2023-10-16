@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 86654d634439b7f4dac347f5936d5e81
+timeCreated: 1522677666
+licenseType: Free
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_pAsterCube: {fileID: 1688373478960898, guid: 882a07943eb52b543a37137fbef97310,
+      type: 2}
+  - m_pPlanet: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
