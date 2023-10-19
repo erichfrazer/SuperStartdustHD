@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Mime;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,17 +24,19 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     float m_fDragDiv = 2.0f;
     float m_fMaxForwardVel = 5.0f;
 
+    bool m_bFireDown;
+    float m_fFireFrequency = 0.05f;
+
     public AudioClip m_pLongLongThrustSound;
     public AudioClip m_pLongThrustSound;
     public AudioClip m_pThrustSound;
-    public GameObject m_pSolarSystem;
-    public GameObject m_pPlanet;
-    public GameObject m_pBulletPrefab;
-    public Camera m_pCamera;
+    public AudioClip m_pFastLaserSound;
+    public GameObject m_pBullet2;
     public GameObject m_pLight;
     public GameObject m_pGeoSyncCamParent;
 
     float m_fLastTimeThrustPlayed;
+    AudioSource m_pAudioSource;
 
     static ShipScript m_sInstance;
 
@@ -58,7 +61,9 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     {
         Vector3 shipPos = transform.position;
         Camera.main.transform.position = shipPos.normalized * 10;
-            
+        m_pAudioSource = GetComponent<AudioSource>();
+        m_pFastLaserSound.LoadAudioData();
+
         m_bStayTangential = true;
         m_bAbsoluteDistance = true;
 
@@ -86,7 +91,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         {
             if (Math.Abs(m_fTurnVel) > 0)
             {
-                m_fTurnAccel /= m_fDragDiv;
+                m_fTurnVel /= m_fDragDiv;
             }
         }
 
@@ -118,7 +123,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             }
         }
 
-        m_fTurnVel += m_fTurnAccel * Time.deltaTime;
+        m_fTurnVel += 5 * m_fTurnAccel * Time.deltaTime;
         m_fForwardVel += m_fForwardAccel * Time.deltaTime;
         if (m_fForwardVel > m_fMaxForwardVel)
         {
@@ -132,16 +137,22 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
 
         if ( m_fForwardVel > 0 )
         {
-            ParticleSystem.MainModule p = m_pEngineParticles.main;
-            p.loop = false;
-            m_pEngineParticles.Emit(1);
+            if (m_pEngineParticles != null)
+            {
+                ParticleSystem.MainModule p = m_pEngineParticles.main;
+                p.loop = false;
+                m_pEngineParticles.Emit(1);
+            }
 
-            if(m_fForwardVel > 150 )
+            if (m_fForwardVel > 150 )
             {
                 if( fNow - m_fLastTimeThrustPlayed > 5 )
                 {
                     m_fLastTimeThrustPlayed = fNow;
-                    AudioSource.PlayClipAtPoint( m_pLongLongThrustSound, transform.position, 0.5f );
+                    if (m_pLongLongThrustSound != null)
+                    {
+                        AudioSource.PlayClipAtPoint(m_pLongLongThrustSound, transform.position, 0.5f);
+                    }
                 }
             }
             else if(m_fForwardVel > 50 )
@@ -149,7 +160,10 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
                 if ( fNow - m_fLastTimeThrustPlayed > 2 )
                 {
                     m_fLastTimeThrustPlayed = fNow;
-                    AudioSource.PlayClipAtPoint( m_pLongThrustSound, transform.position, 0.5f );
+                    if (m_pLongThrustSound != null)
+                    {
+                        AudioSource.PlayClipAtPoint(m_pLongThrustSound, transform.position, 0.5f);
+                    }
                 }
             }
             else
@@ -157,14 +171,20 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
                 if ( fNow - m_fLastTimeThrustPlayed > 1 )
                 {
                     m_fLastTimeThrustPlayed = fNow;
-                    AudioSource.PlayClipAtPoint( m_pThrustSound, transform.position, 0.5f );
+                    if (m_pThrustSound != null)
+                    {
+                        AudioSource.PlayClipAtPoint(m_pThrustSound, transform.position, 0.5f);
+                    }
                 }
             }
         }
         else
         {
-            ParticleSystem.MainModule p = m_pEngineParticles.main;
-            p.loop = false;
+            if (m_pEngineParticles != null)
+            {
+                ParticleSystem.MainModule p = m_pEngineParticles.main;
+                p.loop = false;
+            }
         }
 
         SpinWorld();
@@ -179,22 +199,20 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         Vector3 vRotatedByQ = parentLocalR * vTest;
         Vector3 vRotatedByM = parentLocalM * vTest;
 
+        CheckFireBullet();
+
         int Stop = 1;
     }
 
     void SpinWorld()
     {
-        // m_pPlanet is at the center of everything.
-        // 'this' is the ship, and is child to the planet, but it's position pShipPos, is given in world space.
-        // pCamPos is also in world space, but is not child of the planet.
-        //
-        // we should be able to cast two rays from the center of the planet, one to the ship,
-        // and one to the camera, and calculate the rotation to bring the ray that goes to the ship,
-        // onto the same ray that goes to the camera.
-        //
-        // Since camera is guaranteed at negative Z only compared to center of planet, there should be
-        // NO component of z axis spin on the calculated rotation that brings the ship into alignment.
-        // It should be x and y axis only
+        // We rotate the ship around the planet, and rotate the camera to keep the ship in view.
+        // The planet does not rotate.
+
+        if( TheSystemScript.Singleton == null )
+        {
+            return;
+        }
 
         Vector3 pShipPos = transform.position;
         Vector3 pCamPos = Camera.main.transform.position;
@@ -221,30 +239,30 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             Transform pCamTrans = Camera.main.transform;
             Vector3 spunVectorForwards = pCamTrans.parent.position - pCamTrans.position;
             pCamTrans.forward = spunVectorForwards;
-
-#if false
-            Quaternion q = Quaternion.FromToRotation(planet2Ship, planet2Camera);
-            // rotate a little more to where we should be pointed, each time. The order of the multiplication for the 2nd arg
-            // makes a difference. We want to take the original rotation, and stack the additional rotation on it AFTER the original
-            // one. Quaternion multiplication order is right-to-left...
-            Quaternion r = Quaternion.RotateTowards(pWorldTransform.rotation, q * pWorldTransform.rotation, 10.0f * Time.deltaTime);
-            pWorldTransform.rotation = r;
-#endif
-        }
+         }
     }
 
     void ShootBullet( )
     {
         GameObject pNewBullet = Instantiate(
-            m_pBulletPrefab,
+            m_pBullet2,
             transform.position, // world space
             transform.rotation, // world space
-            transform.parent );
+            null);
 
-        BulletScript p = pNewBullet.GetComponent<BulletScript>();
-        p.m_fMaxDistance = 180;
+        // the solar system doesn't rotate or have a rotation
+
+        SpringJoint js = pNewBullet.GetComponent<SpringJoint>();
+        js.autoConfigureConnectedAnchor = false;
+        js.connectedAnchor = Vector3.zero;
+        
+        // the axis of rotation for the bullet is the ship's 'right' axis
         Rigidbody rb = pNewBullet.GetComponent<Rigidbody>( );
-        rb.AddForce( pNewBullet.transform.forward * 500.0f, ForceMode.Force );
+        rb.AddForce(transform.forward * 300, ForceMode.Force);
+        // rb.AddTorque(transform.right * 300, ForceMode.Force);
+
+        m_pAudioSource.clip = m_pFastLaserSound;
+        m_pAudioSource.Play();
     }
 
     public void OnMoveVector2(InputAction.CallbackContext context)
@@ -258,13 +276,25 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
 
     public void OnFire(InputAction.CallbackContext context)
     {
+        m_bFireDown = context.ReadValueAsButton();
+        Debug.Log("FireDown=" + m_bFireDown + ", " + context.ReadValueAsButton());
+    }
+
+    public void CheckFireBullet()
+    {
+        if (!m_bFireDown)
+        {
+            return;
+        }
+
         float fNow = Time.time;
         float fDelta = fNow - m_fLastTimeShot;
-        if( fDelta < 0.1f )
+        if (fDelta < m_fFireFrequency)
         {
             return;
         }
         m_fLastTimeShot = fNow;
         ShootBullet();
     }
+
 }

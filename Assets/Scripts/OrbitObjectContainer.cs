@@ -36,7 +36,7 @@ public class OrbitThing : MonoBehaviour
 
         if (m_bStayTangential)
         {
-            Vector3 spunVectorUp = transform.position - transform.parent.position;
+            Vector3 spunVectorUp = transform.position;
             spunVectorUp.Normalize();
             Vector3 spunVectorForward_Wrong = transform.forward;
             Vector3 spunVectorRight = Vector3.Cross(spunVectorUp, spunVectorForward_Wrong);
@@ -51,6 +51,10 @@ public class OrbitThing : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>( );
 
         if (this is BlueBugScript)
+        {
+            int stop = 0;
+        }
+        if( this is BulletScript )
         {
             int stop = 0;
         }

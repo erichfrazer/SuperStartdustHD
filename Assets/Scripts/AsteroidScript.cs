@@ -75,6 +75,8 @@ public class AsteroidScript : OrbitThing
     void BulletHitUs(Collision collision)
     {
         BulletScript pBulletScript = collision.gameObject.GetComponent<BulletScript>();
+        if (pBulletScript == null) return;
+
         if( pBulletScript.m_bDetectedHit )
         {
             return;
