@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.19592407, g: 0.09793534, b: 0.12011028, a: 1}
+  m_IndirectSpecularColor: {r: 0.031356305, g: 0.009549969, b: 0.0132265445, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -16971,12 +16971,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_bInOrbit: 1
   m_bStayTangential: 1
+  m_bStayInOrbitByForce: 0
   m_bAbsoluteDistance: 1
+  m_rSpringK: 10
   m_pLongLongThrustSound: {fileID: 0}
   m_pLongThrustSound: {fileID: 0}
   m_pThrustSound: {fileID: 0}
   m_pFastLaserSound: {fileID: 8300000, guid: a036bcc9f42a14e4fb8db27677ebe27a, type: 3}
   m_pBullet2: {fileID: 3612344408507520622, guid: 2ade7670d53918e43a6acfbcc671c669,
+    type: 3}
+  m_pBullet3: {fileID: 9128750334018603020, guid: 707394e2c8e70b44ba6a1c02d01e9ee6,
     type: 3}
   m_pLight: {fileID: 1718273592}
   m_pGeoSyncCamParent: {fileID: 433659609}

@@ -9,9 +9,13 @@ public class OrbitThing : MonoBehaviour
 
     public bool m_bInOrbit;
     public bool m_bStayTangential;
+    public bool m_bStayInOrbitByForce;
     public bool m_bAbsoluteDistance;
+    public float m_fSpringK = 100.0f;
+    public float m_fSpringDrag = 0.05f;
 
-    float DistanceToPlanet = 4.0f;
+    float OrbitRadius = 4.0f;
+    Rigidbody m_pRB;
 
     public bool InOrbit
     {
@@ -23,10 +27,38 @@ public class OrbitThing : MonoBehaviour
 
     private void Start()
     {
+        m_pRB = transform.GetComponent<Rigidbody>();
+    }
+
+    private void Awake()
+    {
+        m_pRB = transform.GetComponent<Rigidbody>();
+    }
+
+    void ForceAdjustOrbit()
+    {
+        // spring equation
+        // Fs = -k * fDeltaOrbitDist
+
+        Vector3 vPriorForce = m_pRB.GetAccumulatedForce();
+        // we want the only force in the planet's direction to be a corrective force.
+        float fPriorForceTowardsPlanet = Vector3.Dot(transform.position, vPriorForce);
+        float fDistToPlanet = transform.position.magnitude;
+        float fDeltaOrbitDist = fDistToPlanet - OrbitRadius; // > 0, object is too far out
+        float fForceSpring = -m_fSpringK * fDeltaOrbitDist;
+        float fForceToAdd = fForceSpring - fPriorForceTowardsPlanet;
+       m_pRB.AddForce(transform.position.normalized * fForceToAdd, ForceMode.Force);
+
+        // get the velocity in the planet direction and dampen it
+        float fPriorVelTowardsPlanet = Vector3.Dot(transform.position, m_pRB.velocity);
+        float fVelocityChange = -m_fSpringDrag * fPriorVelTowardsPlanet;
+        m_pRB.AddForce(transform.position.normalized * fVelocityChange, ForceMode.VelocityChange);
+
+        Debug.Log("prior force=" + fPriorForceTowardsPlanet + " Dist = " + fDeltaOrbitDist + ", Adding force " + transform.position.normalized * fForceToAdd);
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void FixedUpdate()
     {
         // this routine does two things:
         // 1. It makes sure once it's in orbit, that it STAYS in orbit (by ensuring it's transform position is a fixed length from center of planet)
@@ -43,6 +75,12 @@ public class OrbitThing : MonoBehaviour
             Vector3 spunVectorForward = Vector3.Cross(spunVectorRight, spunVectorUp);
             Quaternion q = Quaternion.LookRotation(spunVectorForward, spunVectorUp);
             transform.rotation = q;
+        }
+
+        if (m_bStayInOrbitByForce)
+        {
+            ForceAdjustOrbit();
+            return;
         }
 
         Vector3 pNewLocalPos = transform.localPosition;
@@ -66,13 +104,13 @@ public class OrbitThing : MonoBehaviour
             // KEEP it in orbit by keeping its distance to the center a fixed #. This will oddly affect physics.
             if (m_bAbsoluteDistance)
             {
-                pNewLocalPos *= DistanceToPlanet / fDistance;
+                pNewLocalPos *= OrbitRadius / fDistance;
                 transform.localPosition = pNewLocalPos;
 
             }
             else
             {
-                Vector3 pOnOrbit = pNewLocalPos * DistanceToPlanet / fDistance;
+                Vector3 pOnOrbit = pNewLocalPos * OrbitRadius / fDistance;
                 Vector3 pDelta = pNewLocalPos - pOnOrbit;
 
                 rb.AddForce(-pDelta.x, -pDelta.y, -pDelta.z);
@@ -85,7 +123,7 @@ public class OrbitThing : MonoBehaviour
             // Debug.Log( "distance = " + fDistance );
 
             // bring it back into orbit
-            if (fDistance > DistanceToPlanet)
+            if (fDistance > OrbitRadius)
             {
                 float fNewDistance = fDistance / 1.005f;
                 pNewLocalPos *= fNewDistance / fDistance;

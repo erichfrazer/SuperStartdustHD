@@ -31,7 +31,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     public AudioClip m_pLongThrustSound;
     public AudioClip m_pThrustSound;
     public AudioClip m_pFastLaserSound;
-    public GameObject m_pBullet2;
+    public GameObject m_pBullet3;
     public GameObject m_pLight;
     public GameObject m_pGeoSyncCamParent;
 
@@ -123,7 +123,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             }
         }
 
-        m_fTurnVel += 5 * m_fTurnAccel * Time.deltaTime;
+        m_fTurnVel += 2 * m_fTurnAccel * Time.deltaTime;
         m_fForwardVel += m_fForwardAccel * Time.deltaTime;
         if (m_fForwardVel > m_fMaxForwardVel)
         {
@@ -242,24 +242,18 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
          }
     }
 
-    void ShootBullet( )
+    void ShootBullet3()
     {
+        // put the new bullet right where the ship is
         GameObject pNewBullet = Instantiate(
-            m_pBullet2,
+            m_pBullet3,
             transform.position, // world space
             transform.rotation, // world space
             null);
 
-        // the solar system doesn't rotate or have a rotation
-
-        SpringJoint js = pNewBullet.GetComponent<SpringJoint>();
-        js.autoConfigureConnectedAnchor = false;
-        js.connectedAnchor = Vector3.zero;
-        
         // the axis of rotation for the bullet is the ship's 'right' axis
-        Rigidbody rb = pNewBullet.GetComponent<Rigidbody>( );
+        Rigidbody rb = pNewBullet.GetComponent<Rigidbody>();
         rb.AddForce(transform.forward * 300, ForceMode.Force);
-        // rb.AddTorque(transform.right * 300, ForceMode.Force);
 
         m_pAudioSource.clip = m_pFastLaserSound;
         m_pAudioSource.Play();
@@ -294,7 +288,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             return;
         }
         m_fLastTimeShot = fNow;
-        ShootBullet();
+        ShootBullet3();
     }
 
 }

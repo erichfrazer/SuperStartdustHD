@@ -13,16 +13,17 @@ public class BulletScript : OrbitThing
 
     void Start ()
     {
-        base.m_bStayTangential = true;
+        base.m_bStayInOrbitByForce = true;
 
         m_pLastPos = transform.position;
         m_fTravelDist = 0;
-        m_pActualBulletT = transform.Find("bullet");
+        // m_pActualBulletT = transform.Find("bullet");
     }
 
     void Update ()
     {
-        
+        return;
+
         Vector3 pos = m_pActualBulletT.position;
         Vector3 delta = pos - m_pLastPos;
         m_pLastPos = pos;
