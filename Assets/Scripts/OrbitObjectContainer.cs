@@ -15,7 +15,7 @@ public class OrbitThing : MonoBehaviour
     public float m_fSpringDrag = 0.05f;
 
     float OrbitRadius = 4.0f;
-    Rigidbody m_pRB;
+    protected Rigidbody m_pRB;
 
     public bool InOrbit
     {

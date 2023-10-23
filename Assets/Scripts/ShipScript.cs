@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Mime;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 
 public class ShipScript : OrbitThing, InputActions.IGameplayActions
 {
@@ -242,6 +242,8 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
          }
     }
 
+    Transform m_pLastBullet3 = null;
+
     void ShootBullet3()
     {
         // put the new bullet right where the ship is
@@ -251,9 +253,28 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             transform.rotation, // world space
             null);
 
+        BulletScript bs = pNewBullet.GetComponent<BulletScript>();
+
         // the axis of rotation for the bullet is the ship's 'right' axis
         Rigidbody rb = pNewBullet.GetComponent<Rigidbody>();
         rb.AddForce(transform.forward * 300, ForceMode.Force);
+
+        // connect new bullet to us
+        SpringJoint sjNew = pNewBullet.AddComponent<SpringJoint>();
+        sjNew.connectedBody = GetComponent<Rigidbody>();
+        bs.m_pPriorBullet = m_pLastBullet3;
+        bs.m_pNextBullet = transform;
+
+        // link prior fired one to current one. set up the 'next'. Prior is earlier-fired.
+        if (m_pLastBullet3 != null)
+        {
+            SpringJoint sj = m_pLastBullet3.GetComponent<SpringJoint>();
+            sj.connectedBody = pNewBullet.GetComponent<Rigidbody>(); // used to point to the ship, now it's the new bullet
+
+            BulletScript bsNext = m_pLastBullet3.GetComponent<BulletScript>();
+            bsNext.m_pNextBullet = bs.transform; // used to point to the ship, now it's the new bullet
+        }
+        m_pLastBullet3 = pNewBullet.transform;
 
         m_pAudioSource.clip = m_pFastLaserSound;
         m_pAudioSource.Play();
@@ -271,6 +292,15 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     public void OnFire(InputAction.CallbackContext context)
     {
         m_bFireDown = context.ReadValueAsButton();
+        if( !m_bFireDown )
+        {
+            // unset the last bullet's spring so it can fly free
+            BulletScript bs = m_pLastBullet3.GetComponent<BulletScript>();
+            Destroy(bs.GetComponent<SpringJoint>());
+
+            m_pLastBullet3 = null;
+        }
+
         Debug.Log("FireDown=" + m_bFireDown + ", " + context.ReadValueAsButton());
     }
 
