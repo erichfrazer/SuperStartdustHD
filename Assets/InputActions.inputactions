@@ -22,20 +22,18 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "MoveJoystick",
+                    "type": "Value",
+                    "id": "bd9a25b0-8178-426e-9552-3fb5505f3d17",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "c8f2f50a-eaf4-4404-b922-d4cd586a8aca",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "MoveVector2",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "2D Vector",
                     "id": "31876c92-046c-4d54-9695-37c654f7cf0f",
@@ -99,6 +97,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b79dbee0-cc21-4485-9d8e-f787a81eb504",
+                    "path": "<XInputController>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveJoystick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

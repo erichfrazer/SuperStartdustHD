@@ -44,20 +44,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveJoystick"",
+                    ""type"": ""Value"",
+                    ""id"": ""bd9a25b0-8178-426e-9552-3fb5505f3d17"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""c8f2f50a-eaf4-4404-b922-d4cd586a8aca"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""MoveVector2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": ""2D Vector"",
                     ""id"": ""31876c92-046c-4d54-9695-37c654f7cf0f"",
@@ -123,6 +121,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b79dbee0-cc21-4485-9d8e-f787a81eb504"",
+                    ""path"": ""<XInputController>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveJoystick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -133,6 +142,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_gameplay = asset.FindActionMap("gameplay", throwIfNotFound: true);
         m_gameplay_MoveVector2 = m_gameplay.FindAction("MoveVector2", throwIfNotFound: true);
         m_gameplay_Fire = m_gameplay.FindAction("Fire", throwIfNotFound: true);
+        m_gameplay_MoveJoystick = m_gameplay.FindAction("MoveJoystick", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -196,12 +206,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
     private readonly InputAction m_gameplay_MoveVector2;
     private readonly InputAction m_gameplay_Fire;
+    private readonly InputAction m_gameplay_MoveJoystick;
     public struct GameplayActions
     {
         private @InputActions m_Wrapper;
         public GameplayActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @MoveVector2 => m_Wrapper.m_gameplay_MoveVector2;
         public InputAction @Fire => m_Wrapper.m_gameplay_Fire;
+        public InputAction @MoveJoystick => m_Wrapper.m_gameplay_MoveJoystick;
         public InputActionMap Get() { return m_Wrapper.m_gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -217,6 +229,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Fire.started += instance.OnFire;
             @Fire.performed += instance.OnFire;
             @Fire.canceled += instance.OnFire;
+            @MoveJoystick.started += instance.OnMoveJoystick;
+            @MoveJoystick.performed += instance.OnMoveJoystick;
+            @MoveJoystick.canceled += instance.OnMoveJoystick;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -227,6 +242,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Fire.started -= instance.OnFire;
             @Fire.performed -= instance.OnFire;
             @Fire.canceled -= instance.OnFire;
+            @MoveJoystick.started -= instance.OnMoveJoystick;
+            @MoveJoystick.performed -= instance.OnMoveJoystick;
+            @MoveJoystick.canceled -= instance.OnMoveJoystick;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -248,5 +266,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     {
         void OnMoveVector2(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
+        void OnMoveJoystick(InputAction.CallbackContext context);
     }
 }

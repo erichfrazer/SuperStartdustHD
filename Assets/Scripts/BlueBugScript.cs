@@ -110,7 +110,7 @@ public class BlueBugScript : MonoBehaviour
         GameObject pHit = collision.gameObject;
         //Debug.Log( "bug hit object" + pHit.name );
 
-        if ( pHit.name.StartsWith( "bullet" ) )
+        if ( pHit.layer == 6)
         {
             BulletHitUs( collision );
         }

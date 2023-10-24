@@ -23,6 +23,8 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     float m_fDrag = 0.5f;
     float m_fDragDiv = 2.0f;
     float m_fMaxForwardVel = 5.0f;
+    double m_dJoystickPointDegrees;
+
 
     bool m_bFireDown;
     float m_fFireFrequency = 0.05f;
@@ -73,6 +75,11 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             inputActions.gameplay.SetCallbacks(this);
             inputActions.gameplay.Enable();
         }
+    }
+
+    void FixedUpdate()
+    {
+        CheckFireBullet();
     }
 
     // Update is called once per frame
@@ -188,20 +195,6 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         }
 
         SpinWorld();
-
-        Quaternion parentLocalR = transform.parent.transform.localRotation;
-        Quaternion localR = transform.localRotation;
-        Quaternion finalR = transform.rotation;
-        Quaternion finalR_calc = parentLocalR * localR;
-        Matrix4x4 parentLocalM = transform.parent.localToWorldMatrix;
-        Matrix4x4 thisWorldM = transform.localToWorldMatrix;
-        Vector3 vTest = new Vector3(1, 0.5f, 0.2f);
-        Vector3 vRotatedByQ = parentLocalR * vTest;
-        Vector3 vRotatedByM = parentLocalM * vTest;
-
-        CheckFireBullet();
-
-        int Stop = 1;
     }
 
     void SpinWorld()
@@ -321,4 +314,11 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         ShootBullet3();
     }
 
+    public void OnMoveJoystick(InputAction.CallbackContext context)
+    {
+        m_dJoystickPointDegrees = 0;
+        Vector2 v2 = context.ReadValue<Vector2>();
+        m_dJoystickPointDegrees = Math.Atan2(v2.y, v2.x);
+    }
+    
 }

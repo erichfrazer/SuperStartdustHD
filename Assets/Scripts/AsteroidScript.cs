@@ -66,7 +66,7 @@ public class AsteroidScript : OrbitThing
     private void OnCollisionEnter(Collision collision)
     {
         GameObject pHit = collision.gameObject;
-        if (pHit.name.StartsWith( "bullet" ) )
+        if (pHit.layer == 6 )
         {
             BulletHitUs(collision);
         }
