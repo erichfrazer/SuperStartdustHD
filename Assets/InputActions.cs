@@ -53,6 +53,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ThrustButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""08a0c0d3-484f-463e-93ef-9f3011de4293"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -124,12 +133,45 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""35be0a66-a11d-42f8-bc72-7cb5e446c7f6"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""b79dbee0-cc21-4485-9d8e-f787a81eb504"",
                     ""path"": ""<XInputController>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MoveJoystick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""667e0ef8-0ed3-4c9f-9be4-dde231931bf8"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ThrustButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""efb7ade3-ec76-4451-a595-1d88d5211b15"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ThrustButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -143,6 +185,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_gameplay_MoveVector2 = m_gameplay.FindAction("MoveVector2", throwIfNotFound: true);
         m_gameplay_Fire = m_gameplay.FindAction("Fire", throwIfNotFound: true);
         m_gameplay_MoveJoystick = m_gameplay.FindAction("MoveJoystick", throwIfNotFound: true);
+        m_gameplay_ThrustButton = m_gameplay.FindAction("ThrustButton", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +250,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_gameplay_MoveVector2;
     private readonly InputAction m_gameplay_Fire;
     private readonly InputAction m_gameplay_MoveJoystick;
+    private readonly InputAction m_gameplay_ThrustButton;
     public struct GameplayActions
     {
         private @InputActions m_Wrapper;
@@ -214,6 +258,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @MoveVector2 => m_Wrapper.m_gameplay_MoveVector2;
         public InputAction @Fire => m_Wrapper.m_gameplay_Fire;
         public InputAction @MoveJoystick => m_Wrapper.m_gameplay_MoveJoystick;
+        public InputAction @ThrustButton => m_Wrapper.m_gameplay_ThrustButton;
         public InputActionMap Get() { return m_Wrapper.m_gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -232,6 +277,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MoveJoystick.started += instance.OnMoveJoystick;
             @MoveJoystick.performed += instance.OnMoveJoystick;
             @MoveJoystick.canceled += instance.OnMoveJoystick;
+            @ThrustButton.started += instance.OnThrustButton;
+            @ThrustButton.performed += instance.OnThrustButton;
+            @ThrustButton.canceled += instance.OnThrustButton;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -245,6 +293,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MoveJoystick.started -= instance.OnMoveJoystick;
             @MoveJoystick.performed -= instance.OnMoveJoystick;
             @MoveJoystick.canceled -= instance.OnMoveJoystick;
+            @ThrustButton.started -= instance.OnThrustButton;
+            @ThrustButton.performed -= instance.OnThrustButton;
+            @ThrustButton.canceled -= instance.OnThrustButton;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -267,5 +318,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnMoveVector2(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnMoveJoystick(InputAction.CallbackContext context);
+        void OnThrustButton(InputAction.CallbackContext context);
     }
 }

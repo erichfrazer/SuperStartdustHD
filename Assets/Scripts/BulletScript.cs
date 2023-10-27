@@ -15,7 +15,7 @@ public class BulletScript : OrbitThing
 
     void Start ()
     {
-        base.m_bStayInOrbitByForce = true;
+        m_bInOrbit = true;
         m_bRotateSmoothly = true;
 
         m_pLastPos = transform.position;

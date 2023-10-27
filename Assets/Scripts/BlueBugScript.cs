@@ -22,7 +22,7 @@ public class BlueBugScript : MonoBehaviour
         BoidBehaviour bb = GetComponent<BoidBehaviour>();
         m_pOrbitThing = bb as OrbitThing;
 
-        m_pOrbitThing.m_bAbsoluteDistance = true;
+        m_pOrbitThing.m_bInOrbit = true;
 
         m_pGameControllerScript = GameControllerScript.Singleton;
         m_pTheShip = ShipScript.Singleton.gameObject;

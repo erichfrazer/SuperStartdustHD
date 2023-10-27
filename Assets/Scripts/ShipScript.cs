@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 
-public class ShipScript : OrbitThing, InputActions.IGameplayActions
+public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
 {
     enum Method
     {
@@ -14,19 +14,11 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         Method2
     } ;
 
-    float m_fXAxis;
-    float m_fYAxis;
-    float m_fForwardAccel;
-    float m_fForwardVel;
-    float m_fTurnAccel;
-    float m_fTurnVel;
-    float m_fDrag = 0.5f;
-    float m_fDragDiv = 2.0f;
-    float m_fMaxForwardVel = 5.0f;
     double m_dJoystickPointDegrees;
 
 
     bool m_bFireDown;
+    bool m_bThrustDown;
     float m_fFireFrequency = 0.05f;
 
     public AudioClip m_pLongLongThrustSound;
@@ -35,7 +27,6 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     public AudioClip m_pFastLaserSound;
     public GameObject m_pBullet3;
     public GameObject m_pLight;
-    public GameObject m_pGeoSyncCamParent;
 
     float m_fLastTimeThrustPlayed;
     AudioSource m_pAudioSource;
@@ -55,19 +46,23 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
 
     private void Awake( )
     {
+        // base.Awake();
+
         m_sInstance = this;
     }
 
     // Use this for initialization
     void Start ()
     {
+        // base.Start();
+
         Vector3 shipPos = transform.position;
         Camera.main.transform.position = shipPos.normalized * 10;
         m_pAudioSource = GetComponent<AudioSource>();
         m_pFastLaserSound.LoadAudioData();
 
-        m_bStayTangential = true;
-        m_bAbsoluteDistance = true;
+        // m_bStayTangential = true;
+        // m_bInOrbit = true;
 
         if( inputActions == null )
         {
@@ -77,73 +72,23 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         }
     }
 
-    void FixedUpdate()
-    {
-        CheckFireBullet();
-    }
-
     // Update is called once per frame
     void Update ()
     {
         float fNow = Time.time;
 
-        bool bActivelyTurning = false;
-        float f = m_fXAxis;
-        if (f != 0)
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        if (m_bThrustDown)
         {
-            m_fTurnAccel = f;
-            bActivelyTurning = true;
-        }
-        else
-        {
-            if (Math.Abs(m_fTurnVel) > 0)
-            {
-                m_fTurnVel /= m_fDragDiv;
-            }
+            rb.AddForce(transform.forward * 3, ForceMode.Acceleration);
         }
 
-        float fy = m_fYAxis;
-        if (fy > 0 )
-        {
-            m_fForwardAccel = fy / 3.0f;
-        }
-        else
-        {
-            if( m_fForwardVel > 0 )
-            {
-                m_fForwardAccel = -m_fDrag;
-            }
-        }
+        Vector3 velocity = rb.velocity;
 
-        if (m_fForwardVel < 0)
+        if ( velocity.magnitude > 0.1f )
         {
-            m_fForwardVel = 0;
-            m_fForwardAccel = 0;
-        }
 
-        if (!bActivelyTurning)
-        {
-            if (m_fTurnVel < 1)
-            {
-                m_fTurnVel = 0;
-                m_fTurnAccel = 0;
-            }
-        }
-
-        m_fTurnVel += 2 * m_fTurnAccel * Time.deltaTime;
-        m_fForwardVel += m_fForwardAccel * Time.deltaTime;
-        if (m_fForwardVel > m_fMaxForwardVel)
-        {
-            m_fForwardVel = m_fMaxForwardVel;
-        }
-        transform.position += transform.forward * m_fForwardVel * Time.deltaTime;
-
-        // make sure this isn't subject to gimbal lock. How to rotate the ship around it's Y axis no matter what
-        // its local rotation is.
-        transform.localRotation *= Quaternion.Euler(0, m_fTurnVel * 1000.0f * Time.deltaTime, 0);
-
-        if ( m_fForwardVel > 0 )
-        {
             if (m_pEngineParticles != null)
             {
                 ParticleSystem.MainModule p = m_pEngineParticles.main;
@@ -151,7 +96,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
                 m_pEngineParticles.Emit(1);
             }
 
-            if (m_fForwardVel > 150 )
+            if (velocity.magnitude > 150 )
             {
                 if( fNow - m_fLastTimeThrustPlayed > 5 )
                 {
@@ -162,7 +107,7 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
                     }
                 }
             }
-            else if(m_fForwardVel > 50 )
+            else if(velocity.magnitude > 50 )
             {
                 if ( fNow - m_fLastTimeThrustPlayed > 2 )
                 {
@@ -195,6 +140,16 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
         }
 
         SpinWorld();
+
+        CheckFireBullet();
+
+        Vector3 camUp = Camera.main.transform.up;
+        Vector3 shipForward = transform.forward;
+        float fAngle = Vector3.Angle(camUp , shipForward);
+        Debug.Log("fangle = " + fAngle);
+
+        Quaternion q = Quaternion.AngleAxis((float)m_dJoystickPointDegrees, Camera.main.transform.position);
+        this.transform.rotation = Quaternion.Slerp(this.transform.rotation, q, Time.deltaTime);
     }
 
     void SpinWorld()
@@ -209,21 +164,45 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
 
         Vector3 pShipPos = transform.position;
         Vector3 pCamPos = Camera.main.transform.position;
-        Transform pWorldTransform = TheSystemScript.Singleton.transform;
-        Vector3 pWorldPos = pWorldTransform.position;
+        Vector3 pWorldPos = Vector3.zero;
 
         // ray 1
-        Vector3 cam2Ship = pShipPos - pCamPos;
+        Vector3 planet2Ship = pShipPos - pWorldPos;
         // ray 2
-        Vector3 cam2Planet = pWorldPos - pCamPos;
+        Vector3 planet2Cam = pCamPos - pWorldPos;
+        Vector3 cam2Ship = pShipPos - pCamPos;
+
         // what's the angle between them
-        float angle = Vector3.Angle(cam2Ship, cam2Planet);
+        float angle = Vector3.Angle(planet2Ship, planet2Cam);
 
         if (angle > 5.0f)
         {
+            float fMoveFraction = (angle - 5.0f) / 5.0f;
+            // move camera closer to ship
+            Vector3 newCamPos = pCamPos + fMoveFraction * cam2Ship;
+            newCamPos = newCamPos.normalized * 10.0f;
+            Camera.main.transform.position = newCamPos;
+
+            Vector3 spunVectorForward = -Camera.main.transform.position;
+            spunVectorForward.Normalize();
+            Vector3 spunVectorUp_Wrong = Camera.main.transform.up;
+            Vector3 spunVectorRight = Vector3.Cross(spunVectorForward, spunVectorUp_Wrong);
+            Vector3 spunVectorUp = Vector3.Cross(spunVectorRight, spunVectorForward);
+            Quaternion q = Quaternion.LookRotation(spunVectorForward, spunVectorUp);
+            Camera.main.transform.rotation = q;
+
+#if false
             Quaternion q = Quaternion.FromToRotation(cam2Ship, cam2Planet);
-            // rotate a little more to where we should be pointed, each time. The order of the multiplication for the 2nd arg
-            // makes a difference. We want to take the original rotation, and stack the additional rotation on it AFTER the original
+
+            // rotations stack up like this: q' = world_spin * q, or q' = q * local_spin
+            Camera.main.transform.rotation = Quaternion.RotateTowards(
+                Camera.main.transform.rotation,
+                q * Camera.main.transform.rotation,
+                10.0f * Time.deltaTime);
+
+            // rotate a little more to where we should be pointed, each time.
+            // The order of the multiplication for the 2nd arg makes a difference.
+            // We want to take the original rotation, and stack the additional rotation on it AFTER the original
             // one. Quaternion multiplication order is right-to-left...
             m_pGeoSyncCamParent.transform.rotation = Quaternion.RotateTowards(
                 m_pGeoSyncCamParent.transform.rotation, 
@@ -232,7 +211,8 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
             Transform pCamTrans = Camera.main.transform;
             Vector3 spunVectorForwards = pCamTrans.parent.position - pCamTrans.position;
             pCamTrans.forward = spunVectorForwards;
-         }
+#endif
+        }
     }
 
     Transform m_pLastBullet3 = null;
@@ -276,8 +256,6 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     public void OnMoveVector2(InputAction.CallbackContext context)
     {
         Vector2 joyAxis = context.ReadValue<Vector2>();
-        m_fXAxis = joyAxis.x;
-        m_fYAxis = joyAxis.y;
     }
 
     float m_fLastTimeShot;
@@ -318,7 +296,12 @@ public class ShipScript : OrbitThing, InputActions.IGameplayActions
     {
         m_dJoystickPointDegrees = 0;
         Vector2 v2 = context.ReadValue<Vector2>();
-        m_dJoystickPointDegrees = Math.Atan2(v2.y, v2.x);
+        m_dJoystickPointDegrees = Math.Atan2(v2.y, v2.x) * 180 / Math.PI;
+        Debug.Log("Degrees = " + m_dJoystickPointDegrees);
     }
-    
+
+    public void OnThrustButton(InputAction.CallbackContext context)
+    {
+        m_bThrustDown = context.ReadValueAsButton();
+    }
 }

@@ -71,6 +71,8 @@ public class GameControllerScript : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
+        return;
+
         m_fUpdateNowTime = Time.time;
         m_fSecondsIntoWave = m_fUpdateNowTime - m_fTimeAtStartOfWave;
 
