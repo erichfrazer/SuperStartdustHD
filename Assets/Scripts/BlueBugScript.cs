@@ -124,12 +124,6 @@ public class BlueBugScript : MonoBehaviour
         {
             return;
         }
-        if ( pBulletScript.m_bDetectedHit )
-        {
-            return;
-        }
-
-        pBulletScript.m_bDetectedHit = true;
 
         GameObject pNewExplosion = Instantiate(
             m_pGameControllerScript.m_pAsteroidExplosion, 

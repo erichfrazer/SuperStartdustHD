@@ -5,14 +5,15 @@ using UnityEngine;
 
 public class AsteroidScript : OrbitThing
 {
-    GameControllerScript m_pGameControllerScript;
     float m_fStartTime;
     float m_fAliveTime;
     float m_fFadeInTime = 2;
 
     // Use this for initialization
-    void Start ()
+    override internal void Start ()
     {
+        base.Start ();
+
         ReachedOrbit += M_pParentOrbit_ReachedOrbit;
 
         // since we attach the script at runtime, we can't trap this
@@ -32,8 +33,10 @@ public class AsteroidScript : OrbitThing
     }
 
     // Update is called once per frame
-    void Update ()
+    override internal void FixedUpdate ()
     {
+        base.FixedUpdate();
+
         m_fAliveTime = Time.time - m_fStartTime;
 
         if( !InOrbit )
@@ -56,12 +59,6 @@ public class AsteroidScript : OrbitThing
         }
     }
 
-    private void OnEnable()
-    {
-        GameObject pGameController = GameObject.Find("GameController");
-        m_pGameControllerScript = pGameController.GetComponent<GameControllerScript>();
-    }
-
     // only bullets will hit us, other asteroids won't hit us, they'll just bounce
     private void OnCollisionEnter(Collision collision)
     {
@@ -74,20 +71,10 @@ public class AsteroidScript : OrbitThing
 
     void BulletHitUs(Collision collision)
     {
-        BulletScript pBulletScript = collision.gameObject.GetComponent<BulletScript>();
-        if (pBulletScript == null) return;
-
-        if( pBulletScript.m_bDetectedHit )
-        {
-            return;
-        }
-
-        pBulletScript.m_bDetectedHit = true;
-
         if ( name.StartsWith( "Ateroid_White1") )
         {
             GameObject pNewMedAsteroid = Instantiate(
-                m_pGameControllerScript.m_pAsteroidType1_Med,
+                GameControllerScript.Singleton.m_pAsteroidType1_Med,
                 transform.position,
                 UnityEngine.Random.rotation,
                 transform.parent.transform
@@ -96,7 +83,7 @@ public class AsteroidScript : OrbitThing
             AsteroidScript pScript = pNewMedAsteroid.AddComponent<AsteroidScript>();
 
             GameObject pNewMedAsteroid2 = Instantiate(
-                m_pGameControllerScript.m_pAsteroidType1_Med,
+                GameControllerScript.Singleton.m_pAsteroidType1_Med,
                 transform.position,
                 UnityEngine.Random.rotation,
                 transform.parent.transform
@@ -108,7 +95,7 @@ public class AsteroidScript : OrbitThing
         if (name.StartsWith("Ateroid_White2"))
         {
             GameObject pNewAsteroid = Instantiate(
-                m_pGameControllerScript.m_pAsteroidType1_Small, // original
+                GameControllerScript.Singleton.m_pAsteroidType1_Small, // original
                 transform.position,
                 UnityEngine.Random.rotation,
                 transform.parent.transform
@@ -117,7 +104,7 @@ public class AsteroidScript : OrbitThing
             AsteroidScript pScript = pNewAsteroid.AddComponent<AsteroidScript>();
 
             GameObject pNewAsteroid2 = Instantiate(
-                m_pGameControllerScript.m_pAsteroidType1_Small,
+                GameControllerScript.Singleton.m_pAsteroidType1_Small,
                 transform.position,
                 UnityEngine.Random.rotation,
                 transform.parent.transform
@@ -127,7 +114,7 @@ public class AsteroidScript : OrbitThing
         }
 
         GameObject pNewExplosion = Instantiate(
-            m_pGameControllerScript.m_pAsteroidExplosion,
+            GameControllerScript.Singleton.m_pAsteroidExplosion,
             transform.position,
             transform.rotation,
             transform.parent.transform 
@@ -138,15 +125,10 @@ public class AsteroidScript : OrbitThing
         pMain.stopAction = ParticleSystemStopAction.Destroy;
         pExplosionParticleSystem.Play();
 
-        AudioSource pAudio = m_pGameControllerScript.gameObject.GetComponent<AudioSource>();
+        AudioSource pAudio = GameControllerScript.Singleton.gameObject.GetComponent<AudioSource>();
         pAudio.Play();
 
         Destroy(this.gameObject);
         Destroy(collision.gameObject);
-    }
-
-    void OnParticleSystemStopped( )
-    {
-        
     }
 }

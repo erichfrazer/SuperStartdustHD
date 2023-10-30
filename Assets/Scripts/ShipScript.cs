@@ -29,6 +29,7 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
     List<int> m_nWeaponPower = new List<int>((int)WeaponType.Count);
 
     Dictionary<WeaponType, float> m_WeaponSpeedMultiplier = new Dictionary<WeaponType, float>();
+    internal Dictionary<WeaponType, float> m_WeaponMaxAngularDistance = new Dictionary<WeaponType, float>();
 
     public AudioClip m_pLongLongThrustSound;
     public AudioClip m_pLongThrustSound;
@@ -105,6 +106,10 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         m_WeaponSpeedMultiplier.Add(WeaponType.GoldMelter, 1.0f);
         m_WeaponSpeedMultiplier.Add(WeaponType.Rock, 2.0f);
         m_WeaponSpeedMultiplier.Add(WeaponType.Ice, 3.0f);
+
+        m_WeaponMaxAngularDistance.Add(WeaponType.GoldMelter, 180);
+        m_WeaponMaxAngularDistance.Add(WeaponType.Rock, 90);
+        m_WeaponMaxAngularDistance.Add(WeaponType.Ice, 120);
 
         m_pRB = GetComponent<Rigidbody>();
     }
@@ -253,31 +258,53 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         }
     }
 
-    Transform m_pLastBullet = null;
+    Transform[] m_pLastBullet = new Transform[8];
 
     void ShootBullet()
     {
         if (m_nMainWeaponType == WeaponType.GoldMelter)
         {
-            m_pLastBullet = BulletScript.CreateNewBullet(m_pGoldMelter_Prefab, m_pLastBullet, transform);
+            m_pLastBullet[0] = BulletScript.CreateNewBullet(m_pGoldMelter_Prefab, WeaponType.GoldMelter, m_pLastBullet[0], transform);
+
+            Rigidbody pBulletRB = m_pLastBullet[0].GetComponent<Rigidbody>();
+            float fSpeedMultiplier = m_WeaponSpeedMultiplier[m_nMainWeaponType];
+            pBulletRB.AddForce(m_pLastBullet[0].forward * 300 * fSpeedMultiplier, ForceMode.Force);
+
+            m_pAudioSource.clip = m_pFastLaserSound;
+            m_pAudioSource.Play();
         }
         if (m_nMainWeaponType == WeaponType.Rock)
         {
-            m_pLastBullet = BulletScript.CreateNewBullet(m_pRockBuster_Prefab, m_pLastBullet, transform);
+            m_pLastBullet[0] = BulletScript.CreateNewBullet(m_pRockBuster_Prefab, WeaponType.Rock, m_pLastBullet[0], transform);
+
+            Rigidbody pBulletRB = m_pLastBullet[0].GetComponent<Rigidbody>();
+            float fSpeedMultiplier = m_WeaponSpeedMultiplier[m_nMainWeaponType];
+            pBulletRB.AddForce(m_pLastBullet[0].forward * 300 * fSpeedMultiplier, ForceMode.Force);
+
+            m_pAudioSource.clip = m_pFastLaserSound;
+            m_pAudioSource.Play();
         }
 
         if (m_nMainWeaponType == WeaponType.Ice)
         {
-            m_pLastBullet = BulletScript.CreateNewBullet(m_pIceBlaster_Prefab, m_pLastBullet, transform);
+            int n = 3;
+            int angle = 60;
+            for (int i = 0; i < n; i++)
+            {
+                int a = -angle / 2 + (angle / n) * i;
+
+                m_pLastBullet[i] = BulletScript.CreateNewBullet(m_pIceBlaster_Prefab, WeaponType.Ice, m_pLastBullet[i], transform);
+
+                Rigidbody pBulletRB = m_pLastBullet[i].GetComponent<Rigidbody>();
+                float fSpeedMultiplier = m_WeaponSpeedMultiplier[m_nMainWeaponType];
+                Vector3 f = m_pLastBullet[i].forward;
+                Vector3 fr = transform.rotation * Quaternion.Euler(0, a, 0) * f;
+                pBulletRB.AddForce(fr * 300 * fSpeedMultiplier, ForceMode.Force);
+            }
+
+            m_pAudioSource.clip = m_pFastLaserSound;
+            m_pAudioSource.Play();
         }
-
-
-        Rigidbody pBulletRB = m_pLastBullet.GetComponent<Rigidbody>();
-        float fSpeedMultiplier = m_WeaponSpeedMultiplier[m_nMainWeaponType];
-        pBulletRB.AddForce(m_pLastBullet.forward * 300 * fSpeedMultiplier, ForceMode.Force);
-
-        m_pAudioSource.clip = m_pFastLaserSound;
-        m_pAudioSource.Play();
     }
 
     public void OnMoveVector2(InputAction.CallbackContext context)
@@ -292,15 +319,18 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         m_bFireDown = context.ReadValueAsButton();
         if( !m_bFireDown )
         {
-            if (m_pLastBullet != null)
+            for (int i = 0; i < 8; i++)
             {
-                // unset the last bullet's spring so it can fly free
-                ConfigurableJoint cj = m_pLastBullet.GetComponent<ConfigurableJoint>();
-                if ( cj != null )
+                if (m_pLastBullet[i] != null)
                 {
-                    Destroy(cj);
+                    // unset the last bullet's spring so it can fly free
+                    ConfigurableJoint cj = m_pLastBullet[i].GetComponent<ConfigurableJoint>();
+                    if (cj != null)
+                    {
+                        Destroy(cj);
+                    }
+                    m_pLastBullet[i] = null;
                 }
-                m_pLastBullet = null;
             }
         }
 

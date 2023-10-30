@@ -1,18 +1,18 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
-    public bool m_bDetectedHit;
-
     Vector3 m_pLastPos;
     float m_fTravelDist = 0;
     float m_fStartTime;
     Transform m_pActualBulletT;
     Rigidbody m_pRB;
+    internal WeaponType m_BulletType;
 
-    public static Transform CreateNewBullet(GameObject prefab, Transform lastBulletT, Transform shipT)
+    public static Transform CreateNewBullet(GameObject prefab, WeaponType wt, Transform lastBulletT, Transform shipT)
     {
         GameObject pNewBulletPlanet = Instantiate(
             prefab,
@@ -22,6 +22,8 @@ public class BulletScript : MonoBehaviour
         pNewBulletPlanetRB.Move(Vector3.zero, Quaternion.identity);
 
         BulletScript bs = pNewBulletPlanet.GetComponent<BulletScript>();
+        bs.m_BulletType = wt;
+        
         Transform pNewBulletT = bs.BulletT;
         Rigidbody pNewBulletRB = bs.BulletRB;
         pNewBulletT.SetPositionAndRotation(shipT.position, shipT.rotation);
@@ -114,7 +116,8 @@ public class BulletScript : MonoBehaviour
             DestroyMe();
             return;
         }
-        if (m_fTravelDist > 6 * Mathf.PI)
+        float fDistance = ShipScript.m_sInstance.m_WeaponMaxAngularDistance[m_BulletType] * 2.0f * 4.0f / 180;
+        if (m_fTravelDist > fDistance)
         {
              DestroyMe();
             return;
