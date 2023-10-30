@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d7e7ae64f4725d64493362981bc2ae25, type: 2}
+  - {fileID: 2100000, guid: 840b4039dbc9ec5458380a31f83fedd0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 4763334658705775557}
   - component: {fileID: 5574468387916140403}
   m_Layer: 6
-  m_Name: FlameBullet
+  m_Name: RockBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

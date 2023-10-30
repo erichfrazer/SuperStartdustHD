@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Assets.Scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Mime;
+using Unity.Android.Types;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -22,11 +24,21 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
     bool m_bThrustDown;
     float m_fFireFrequency = 0.05f;
 
+    internal WeaponType m_nMainWeaponType;
+    List<bool> m_bHaveWeapon = new List<bool>((int) WeaponType.Count);
+    List<int> m_nWeaponPower = new List<int>((int)WeaponType.Count);
+
+    Dictionary<WeaponType, float> m_WeaponSpeedMultiplier = new Dictionary<WeaponType, float>();
+
     public AudioClip m_pLongLongThrustSound;
     public AudioClip m_pLongThrustSound;
     public AudioClip m_pThrustSound;
     public AudioClip m_pFastLaserSound;
-    public GameObject m_pBulletPrefab;
+    public AudioClip m_pChangeWeaponSound;
+
+    public GameObject m_pGoldMelter_Prefab;
+    public GameObject m_pRockBuster_Prefab;
+    public GameObject m_pIceBlaster_Prefab;
     public GameObject m_pLight;
 
     float m_fLastTimeThrustPlayed;
@@ -35,7 +47,7 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
 
     Rigidbody m_pRB;
 
-    static ShipScript m_sInstance;
+    internal static ShipScript m_sInstance;
 
     static public ShipScript Singleton
     {
@@ -83,6 +95,16 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
             inputActions.gameplay.SetCallbacks(this);
             inputActions.gameplay.Enable();
         }
+
+        for( int i = 0; i < m_bHaveWeapon.Count; i++ )
+        {
+            m_bHaveWeapon[i] = true;
+            m_nWeaponPower[i] = 10;
+        }
+
+        m_WeaponSpeedMultiplier.Add(WeaponType.GoldMelter, 1.0f);
+        m_WeaponSpeedMultiplier.Add(WeaponType.Rock, 2.0f);
+        m_WeaponSpeedMultiplier.Add(WeaponType.Ice, 3.0f);
 
         m_pRB = GetComponent<Rigidbody>();
     }
@@ -235,9 +257,24 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
 
     void ShootBullet()
     {
-        m_pLastBullet = BulletScript.CreateNewBullet(m_pBulletPrefab, m_pLastBullet, transform);
+        if (m_nMainWeaponType == WeaponType.GoldMelter)
+        {
+            m_pLastBullet = BulletScript.CreateNewBullet(m_pGoldMelter_Prefab, m_pLastBullet, transform);
+        }
+        if (m_nMainWeaponType == WeaponType.Rock)
+        {
+            m_pLastBullet = BulletScript.CreateNewBullet(m_pRockBuster_Prefab, m_pLastBullet, transform);
+        }
+
+        if (m_nMainWeaponType == WeaponType.Ice)
+        {
+            m_pLastBullet = BulletScript.CreateNewBullet(m_pIceBlaster_Prefab, m_pLastBullet, transform);
+        }
+
+
         Rigidbody pBulletRB = m_pLastBullet.GetComponent<Rigidbody>();
-        pBulletRB.AddForce(m_pLastBullet.forward * 400, ForceMode.Force);
+        float fSpeedMultiplier = m_WeaponSpeedMultiplier[m_nMainWeaponType];
+        pBulletRB.AddForce(m_pLastBullet.forward * 300 * fSpeedMultiplier, ForceMode.Force);
 
         m_pAudioSource.clip = m_pFastLaserSound;
         m_pAudioSource.Play();
@@ -300,4 +337,56 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
     {
         m_bThrustDown = context.ReadValueAsButton();
     }
+
+    public void OnSwitchWeapons(InputAction.CallbackContext context)
+    {
+    }
+
+    bool m_bLeftShoulderDown;
+    bool m_bRightShoulderDown;
+
+    public void OnLeftShoulder(InputAction.CallbackContext context)
+    {
+        bool down = context.ReadValueAsButton();
+        if (!down && m_bLeftShoulderDown)
+        {
+            // tap
+            PreviousWeapon();
+        }
+        m_bLeftShoulderDown = down;
+    }
+
+    public void OnRightShoulder(InputAction.CallbackContext context)
+    {
+        bool down = context.ReadValueAsButton();
+        if (!down && m_bRightShoulderDown)
+        {
+            // tap
+            NextWeapon();
+        }
+        m_bRightShoulderDown = down;
+    }
+
+    void PreviousWeapon()
+    {
+        m_pAudioSource.clip = m_pChangeWeaponSound;
+        m_pAudioSource.Play();
+        m_nMainWeaponType--;
+        if( m_nMainWeaponType < 0 )
+        {
+            m_nMainWeaponType = WeaponType.Count - 1;
+        }
+    }
+
+    void NextWeapon()
+    {
+        m_pAudioSource.clip = m_pChangeWeaponSound;
+        m_pAudioSource.Play();
+        m_nMainWeaponType++;
+        if (m_nMainWeaponType >= WeaponType.Count )
+        {
+            m_nMainWeaponType = 0;
+        }
+    }
+
 }

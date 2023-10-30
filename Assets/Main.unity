@@ -16458,6 +16458,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 08a0c0d3-484f-463e-93ef-9f3011de4293
     m_ActionName: gameplay/ThrustButton[/Keyboard/upArrow]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2108958347}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 74951544-ee93-4ec5-a558-49addf8b129c
+    m_ActionName: gameplay/SwitchWeapons[/XInputControllerWindows/leftShoulder,/XInputControllerWindows/rightShoulder]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: gameplay
@@ -17139,7 +17155,13 @@ MonoBehaviour:
   m_pLongThrustSound: {fileID: 0}
   m_pThrustSound: {fileID: 0}
   m_pFastLaserSound: {fileID: 8300000, guid: a036bcc9f42a14e4fb8db27677ebe27a, type: 3}
-  m_pBulletPrefab: {fileID: 9128750334018603020, guid: 93cec4cccc340a2419e4a439d51ec4e5,
+  m_pChangeWeaponSound: {fileID: 8300000, guid: 5e3a39465e27e4d49b0d3c965d3bff8b,
+    type: 3}
+  m_pGoldMelter_Prefab: {fileID: 9128750334018603020, guid: 93cec4cccc340a2419e4a439d51ec4e5,
+    type: 3}
+  m_pRockBuster_Prefab: {fileID: 9128750334018603020, guid: 6e02572e29a6b2b4d8cb562a1219dae7,
+    type: 3}
+  m_pIceBlaster_Prefab: {fileID: 9128750334018603020, guid: f74988babf61aaa4d88429b6daf85ebe,
     type: 3}
   m_pLight: {fileID: 1718273592}
   m_pEngineParticles: {fileID: 0}

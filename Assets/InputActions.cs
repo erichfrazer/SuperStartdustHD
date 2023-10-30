@@ -62,6 +62,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftShoulder"",
+                    ""type"": ""Button"",
+                    ""id"": ""74951544-ee93-4ec5-a558-49addf8b129c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightShoulder"",
+                    ""type"": ""Button"",
+                    ""id"": ""97343e5a-9a42-49d9-a5c6-d445ea019802"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -174,6 +192,28 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""ThrustButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e6bf5b7c-6584-4522-9069-de80dc5c94d0"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": ""Tap"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftShoulder"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3935f3f3-f6ba-4777-8858-9eacb814f913"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": ""Tap"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightShoulder"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -186,6 +226,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_gameplay_Fire = m_gameplay.FindAction("Fire", throwIfNotFound: true);
         m_gameplay_MoveJoystick = m_gameplay.FindAction("MoveJoystick", throwIfNotFound: true);
         m_gameplay_ThrustButton = m_gameplay.FindAction("ThrustButton", throwIfNotFound: true);
+        m_gameplay_LeftShoulder = m_gameplay.FindAction("LeftShoulder", throwIfNotFound: true);
+        m_gameplay_RightShoulder = m_gameplay.FindAction("RightShoulder", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -251,6 +293,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_gameplay_Fire;
     private readonly InputAction m_gameplay_MoveJoystick;
     private readonly InputAction m_gameplay_ThrustButton;
+    private readonly InputAction m_gameplay_LeftShoulder;
+    private readonly InputAction m_gameplay_RightShoulder;
     public struct GameplayActions
     {
         private @InputActions m_Wrapper;
@@ -259,6 +303,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @Fire => m_Wrapper.m_gameplay_Fire;
         public InputAction @MoveJoystick => m_Wrapper.m_gameplay_MoveJoystick;
         public InputAction @ThrustButton => m_Wrapper.m_gameplay_ThrustButton;
+        public InputAction @LeftShoulder => m_Wrapper.m_gameplay_LeftShoulder;
+        public InputAction @RightShoulder => m_Wrapper.m_gameplay_RightShoulder;
         public InputActionMap Get() { return m_Wrapper.m_gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -280,6 +326,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ThrustButton.started += instance.OnThrustButton;
             @ThrustButton.performed += instance.OnThrustButton;
             @ThrustButton.canceled += instance.OnThrustButton;
+            @LeftShoulder.started += instance.OnLeftShoulder;
+            @LeftShoulder.performed += instance.OnLeftShoulder;
+            @LeftShoulder.canceled += instance.OnLeftShoulder;
+            @RightShoulder.started += instance.OnRightShoulder;
+            @RightShoulder.performed += instance.OnRightShoulder;
+            @RightShoulder.canceled += instance.OnRightShoulder;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -296,6 +348,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ThrustButton.started -= instance.OnThrustButton;
             @ThrustButton.performed -= instance.OnThrustButton;
             @ThrustButton.canceled -= instance.OnThrustButton;
+            @LeftShoulder.started -= instance.OnLeftShoulder;
+            @LeftShoulder.performed -= instance.OnLeftShoulder;
+            @LeftShoulder.canceled -= instance.OnLeftShoulder;
+            @RightShoulder.started -= instance.OnRightShoulder;
+            @RightShoulder.performed -= instance.OnRightShoulder;
+            @RightShoulder.canceled -= instance.OnRightShoulder;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -319,5 +377,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnFire(InputAction.CallbackContext context);
         void OnMoveJoystick(InputAction.CallbackContext context);
         void OnThrustButton(InputAction.CallbackContext context);
+        void OnLeftShoulder(InputAction.CallbackContext context);
+        void OnRightShoulder(InputAction.CallbackContext context);
     }
 }

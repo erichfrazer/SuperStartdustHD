@@ -40,25 +40,28 @@ public class BulletScript : MonoBehaviour
         {
             Rigidbody pLastBulletRB = lastBulletT.GetComponent<Rigidbody>();
 
+            if (ShipScript.m_sInstance.m_nMainWeaponType == Assets.Scripts.WeaponType.GoldMelter)
+            {
 #if true
-            // add a spring joint between new bullet and prior bullet to that
-            SpringJoint priorSpringJoint = lastBulletT.gameObject.AddComponent<SpringJoint>();
-            Vector3 lastBulletPos = pLastBulletRB.position;
-            Vector3 vMiddle = (lastBulletPos + pNewBulletRB.position) / 2;
-            Vector3 vDelta_NewBullet_worldpos = vMiddle - pNewBulletRB.position;
-            Vector3 vDelta_PriorBullet_worldpos = vMiddle - lastBulletPos;
-            Vector3 vDelta_NewBullet_localpos = pNewBulletT.worldToLocalMatrix * vDelta_NewBullet_worldpos;
-            Vector3 vDelta_PriorBullet_localpos = lastBulletT.worldToLocalMatrix * vDelta_PriorBullet_worldpos;
-            priorSpringJoint.spring = 1;
-            priorSpringJoint.damper = 0.1f;
+                // add a spring joint between new bullet and prior bullet to that
+                SpringJoint priorSpringJoint = lastBulletT.gameObject.AddComponent<SpringJoint>();
+                Vector3 lastBulletPos = pLastBulletRB.position;
+                Vector3 vMiddle = (lastBulletPos + pNewBulletRB.position) / 2;
+                Vector3 vDelta_NewBullet_worldpos = vMiddle - pNewBulletRB.position;
+                Vector3 vDelta_PriorBullet_worldpos = vMiddle - lastBulletPos;
+                Vector3 vDelta_NewBullet_localpos = pNewBulletT.worldToLocalMatrix * vDelta_NewBullet_worldpos;
+                Vector3 vDelta_PriorBullet_localpos = lastBulletT.worldToLocalMatrix * vDelta_PriorBullet_worldpos;
+                priorSpringJoint.spring = 1;
+                priorSpringJoint.damper = 0.1f;
 
-            priorSpringJoint.autoConfigureConnectedAnchor = false;
-            priorSpringJoint.connectedBody = pNewBulletRB;
-            priorSpringJoint.connectedAnchor = vDelta_NewBullet_localpos;
-            priorSpringJoint.anchor = vDelta_PriorBullet_localpos;
-            priorSpringJoint.minDistance = 0;
-            priorSpringJoint.maxDistance = 0;
+                priorSpringJoint.autoConfigureConnectedAnchor = false;
+                priorSpringJoint.connectedBody = pNewBulletRB;
+                priorSpringJoint.connectedAnchor = vDelta_NewBullet_localpos;
+                priorSpringJoint.anchor = vDelta_PriorBullet_localpos;
+                priorSpringJoint.minDistance = 0;
+                priorSpringJoint.maxDistance = 0;
 #endif
+            }
         }
 
         return pNewBulletT;
