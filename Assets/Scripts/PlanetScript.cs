@@ -11,7 +11,7 @@ public class PlanetScript : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        m_pPlanet = transform.Find( "Sphere" ).gameObject;
+        m_pPlanet = transform.Find( "PlanetModel" ).gameObject;
     }
     
     // Update is called once per frame

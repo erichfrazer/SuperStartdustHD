@@ -2,61 +2,119 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletScript : OrbitThing
+public class BulletScript : MonoBehaviour
 {
-    public float m_fMaxDistance;
     public bool m_bDetectedHit;
-    public bool m_bRotateSmoothly;
 
     Vector3 m_pLastPos;
     float m_fTravelDist = 0;
-    public Transform m_pPriorBullet;
-    public Transform m_pNextBullet;
+    float m_fStartTime;
+    Transform m_pActualBulletT;
+    Rigidbody m_pRB;
+
+    public static Transform CreateNewBullet(GameObject prefab, Transform lastBulletT, Transform shipT)
+    {
+        GameObject pNewBulletPlanet = Instantiate(
+            prefab,
+            shipT.parent);
+        pNewBulletPlanet.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        Rigidbody pNewBulletPlanetRB = pNewBulletPlanet.GetComponent<Rigidbody>();
+        pNewBulletPlanetRB.Move(Vector3.zero, Quaternion.identity);
+
+        BulletScript bs = pNewBulletPlanet.GetComponent<BulletScript>();
+        Transform pNewBulletT = bs.BulletT;
+        Rigidbody pNewBulletRB = bs.BulletRB;
+        pNewBulletT.SetPositionAndRotation(shipT.position, shipT.rotation);
+        pNewBulletRB.Move(shipT.position, shipT.rotation);
+
+        // anchor the bullet to the bullet's planet center. This has to be done at runtime, not edit time
+        FixedJoint fj = pNewBulletT.gameObject.AddComponent<FixedJoint>();
+        fj.connectedBody = pNewBulletPlanet.GetComponent<Rigidbody>();
+        fj.autoConfigureConnectedAnchor = true;
+        fj.connectedAnchor = Vector3.zero;
+        fj.anchor = -shipT.position; // opposite of ship's position, to get to 0,0,0
+
+        // reset the spring joint on the previous bullet
+
+        if (lastBulletT != null)
+        {
+            Rigidbody pLastBulletRB = lastBulletT.GetComponent<Rigidbody>();
+
+#if true
+            // add a spring joint between new bullet and prior bullet to that
+            SpringJoint priorSpringJoint = lastBulletT.gameObject.AddComponent<SpringJoint>();
+            Vector3 lastBulletPos = pLastBulletRB.position;
+            Vector3 vMiddle = (lastBulletPos + pNewBulletRB.position) / 2;
+            Vector3 vDelta_NewBullet_worldpos = vMiddle - pNewBulletRB.position;
+            Vector3 vDelta_PriorBullet_worldpos = vMiddle - lastBulletPos;
+            Vector3 vDelta_NewBullet_localpos = pNewBulletT.worldToLocalMatrix * vDelta_NewBullet_worldpos;
+            Vector3 vDelta_PriorBullet_localpos = lastBulletT.worldToLocalMatrix * vDelta_PriorBullet_worldpos;
+            priorSpringJoint.spring = 1;
+            priorSpringJoint.damper = 0.1f;
+
+            priorSpringJoint.autoConfigureConnectedAnchor = false;
+            priorSpringJoint.connectedBody = pNewBulletRB;
+            priorSpringJoint.connectedAnchor = vDelta_NewBullet_localpos;
+            priorSpringJoint.anchor = vDelta_PriorBullet_localpos;
+            priorSpringJoint.minDistance = 0;
+            priorSpringJoint.maxDistance = 0;
+#endif
+        }
+
+        return pNewBulletT;
+    }
+
+    public Rigidbody BulletRB
+    {
+        get
+        {
+            if (m_pRB == null)
+            {
+                m_pRB = BulletT.GetComponent<Rigidbody>();
+            }
+            return m_pRB;
+        }
+    }
+
+    public Transform BulletT
+    {
+        get
+        {
+            if( m_pActualBulletT == null )
+            {
+                m_pActualBulletT = transform.GetChild(0);
+            }
+            return m_pActualBulletT;
+        }
+    }
 
     void Start ()
     {
-        m_bInOrbit = true;
-        m_bRotateSmoothly = true;
-
         m_pLastPos = transform.position;
         m_fTravelDist = 0;
-        // m_pActualBulletT = transform.Find("bullet");
-    }
-
-    void _RotateSmoothly()
-    {
-        if (m_pPriorBullet != null && m_pNextBullet != null)
-        {
-            Vector3 spunVectorUp = transform.position.normalized;
-#if false
-            spunVectorUp.Normalize();
-            Vector3 spunVectorForward_Wrong = transform.forward;
-            Vector3 spunVectorRight = Vector3.Cross(spunVectorUp, spunVectorForward_Wrong);
-            Vector3 spunVectorForward = Vector3.Cross(spunVectorRight, spunVectorUp);
-            Quaternion q = Quaternion.LookRotation(spunVectorForward, spunVectorUp);
-            m_pRB.MoveRotation(q);
-#endif
-
-            Quaternion q = Quaternion.LookRotation(m_pNextBullet.transform.position - m_pPriorBullet.transform.position, spunVectorUp);
-            m_pRB.MoveRotation(q);
-        }
+        m_fStartTime = Time.time;
+        m_pActualBulletT = transform.GetChild(0);
+        m_pRB = m_pActualBulletT.GetComponent<Rigidbody>();
     }
 
     void Update ()
     {
-        if (m_bRotateSmoothly)
-        {
-            _RotateSmoothly();
-        }
 
         Vector3 pos = transform.position;
         Vector3 delta = pos - m_pLastPos;
         m_pLastPos = pos;
         float distance = delta.magnitude;
         m_fTravelDist += distance;
+        float deltaTime = Time.time - m_fStartTime;
+        if (deltaTime > 5)
+        {
+            DestroyMe();
+            return;
+        }
         if (m_fTravelDist > 6 * Mathf.PI)
         {
              DestroyMe();
+            return;
         }
     }
 

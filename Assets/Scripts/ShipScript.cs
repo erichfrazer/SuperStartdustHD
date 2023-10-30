@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Mime;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
@@ -14,7 +15,7 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         Method2
     } ;
 
-    double m_dJoystickPointDegrees;
+    float m_fJoystickPointDegrees;
 
 
     bool m_bFireDown;
@@ -25,11 +26,14 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
     public AudioClip m_pLongThrustSound;
     public AudioClip m_pThrustSound;
     public AudioClip m_pFastLaserSound;
-    public GameObject m_pBullet3;
+    public GameObject m_pBulletPrefab;
     public GameObject m_pLight;
 
     float m_fLastTimeThrustPlayed;
     AudioSource m_pAudioSource;
+    float m_fJoystickXAxis;
+
+    Rigidbody m_pRB;
 
     static ShipScript m_sInstance;
 
@@ -61,15 +65,26 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         m_pAudioSource = GetComponent<AudioSource>();
         m_pFastLaserSound.LoadAudioData();
 
+#if false
+        FixedJoint fj = gameObject.AddComponent<FixedJoint>();
+        fj.connectedBody = transform.parent.GetComponent<Rigidbody>();
+        fj.autoConfigureConnectedAnchor = true;
+        fj.connectedAnchor = Vector3.zero;
+        fj.anchor = -transform.position; // opposite of ship's position, to get to 0,0,0
+        fj.axis = transform.up;
+#endif
+
         // m_bStayTangential = true;
         // m_bInOrbit = true;
 
-        if( inputActions == null )
+        if ( inputActions == null )
         {
             inputActions = new InputActions();
             inputActions.gameplay.SetCallbacks(this);
             inputActions.gameplay.Enable();
         }
+
+        m_pRB = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -81,7 +96,7 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
 
         if (m_bThrustDown)
         {
-            rb.AddForce(transform.forward * 3, ForceMode.Acceleration);
+            rb.AddForce(transform.forward * 10, ForceMode.Acceleration);
         }
 
         Vector3 velocity = rb.velocity;
@@ -143,13 +158,14 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
 
         CheckFireBullet();
 
-        Vector3 camUp = Camera.main.transform.up;
-        Vector3 shipForward = transform.forward;
-        float fAngle = Vector3.Angle(camUp , shipForward);
-        Debug.Log("fangle = " + fAngle);
+        m_fJoystickPointDegrees = 45.0f;
+        Quaternion qCam = Camera.main.transform.rotation;
+        Quaternion qCamSpunAroundY = qCam * Quaternion.Euler(0, m_fJoystickPointDegrees - 90.0f, 0);
+        // this.transform.rotation = Quaternion.Slerp(this.transform.rotation, this.transform.rotation * Quaternion.Euler(0, 5, 0), Time.deltaTime);
+        m_pRB.AddRelativeTorque(Vector2.up * 250 * m_fJoystickXAxis, ForceMode.Force);
 
-        Quaternion q = Quaternion.AngleAxis((float)m_dJoystickPointDegrees, Camera.main.transform.position);
-        this.transform.rotation = Quaternion.Slerp(this.transform.rotation, q, Time.deltaTime);
+        // the fixed joint just doesn't work. ship lifts off the planet for unknown reasons...
+        m_pRB.position = m_pRB.position * 4 / m_pRB.position.magnitude;
     }
 
     void SpinWorld()
@@ -215,39 +231,13 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         }
     }
 
-    Transform m_pLastBullet3 = null;
+    Transform m_pLastBullet = null;
 
-    void ShootBullet3()
+    void ShootBullet()
     {
-        // put the new bullet right where the ship is
-        GameObject pNewBullet = Instantiate(
-            m_pBullet3,
-            transform.position, // world space
-            transform.rotation, // world space
-            null);
-
-        BulletScript bs = pNewBullet.GetComponent<BulletScript>();
-
-        // the axis of rotation for the bullet is the ship's 'right' axis
-        Rigidbody rb = pNewBullet.GetComponent<Rigidbody>();
-        rb.AddForce(transform.forward * 300, ForceMode.Force);
-
-        // connect new bullet to us
-        SpringJoint sjNew = pNewBullet.AddComponent<SpringJoint>();
-        sjNew.connectedBody = GetComponent<Rigidbody>();
-        bs.m_pPriorBullet = m_pLastBullet3;
-        bs.m_pNextBullet = transform;
-
-        // link prior fired one to current one. set up the 'next'. Prior is earlier-fired.
-        if (m_pLastBullet3 != null)
-        {
-            SpringJoint sj = m_pLastBullet3.GetComponent<SpringJoint>();
-            sj.connectedBody = pNewBullet.GetComponent<Rigidbody>(); // used to point to the ship, now it's the new bullet
-
-            BulletScript bsNext = m_pLastBullet3.GetComponent<BulletScript>();
-            bsNext.m_pNextBullet = bs.transform; // used to point to the ship, now it's the new bullet
-        }
-        m_pLastBullet3 = pNewBullet.transform;
+        m_pLastBullet = BulletScript.CreateNewBullet(m_pBulletPrefab, m_pLastBullet, transform);
+        Rigidbody pBulletRB = m_pLastBullet.GetComponent<Rigidbody>();
+        pBulletRB.AddForce(m_pLastBullet.forward * 400, ForceMode.Force);
 
         m_pAudioSource.clip = m_pFastLaserSound;
         m_pAudioSource.Play();
@@ -265,11 +255,16 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         m_bFireDown = context.ReadValueAsButton();
         if( !m_bFireDown )
         {
-            // unset the last bullet's spring so it can fly free
-            BulletScript bs = m_pLastBullet3.GetComponent<BulletScript>();
-            Destroy(bs.GetComponent<SpringJoint>());
-
-            m_pLastBullet3 = null;
+            if (m_pLastBullet != null)
+            {
+                // unset the last bullet's spring so it can fly free
+                ConfigurableJoint cj = m_pLastBullet.GetComponent<ConfigurableJoint>();
+                if ( cj != null )
+                {
+                    Destroy(cj);
+                }
+                m_pLastBullet = null;
+            }
         }
 
         Debug.Log("FireDown=" + m_bFireDown + ", " + context.ReadValueAsButton());
@@ -289,15 +284,16 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
             return;
         }
         m_fLastTimeShot = fNow;
-        ShootBullet3();
+        ShootBullet();
     }
 
     public void OnMoveJoystick(InputAction.CallbackContext context)
     {
-        m_dJoystickPointDegrees = 0;
+        m_fJoystickPointDegrees = 0;
         Vector2 v2 = context.ReadValue<Vector2>();
-        m_dJoystickPointDegrees = Math.Atan2(v2.y, v2.x) * 180 / Math.PI;
-        Debug.Log("Degrees = " + m_dJoystickPointDegrees);
+        m_fJoystickPointDegrees = MathF.Atan2(v2.y, v2.x) * 180 / MathF.PI;
+        Debug.Log("Degrees = " + m_fJoystickPointDegrees);
+        m_fJoystickXAxis = v2.x;
     }
 
     public void OnThrustButton(InputAction.CallbackContext context)
