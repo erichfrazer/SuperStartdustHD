@@ -24,7 +24,6 @@ Shader "Hidden/MK/Glow/MKGlowSM25"
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
 			
-			#define _MK_PPSV2
 			#define _MK_BLOOM
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
 			#pragma multi_compile __ _MK_NATURAL
@@ -46,7 +45,6 @@ Shader "Hidden/MK/Glow/MKGlowSM25"
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
 
-			#define _MK_PPSV2
 			#define _MK_BLOOM
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
 
@@ -66,7 +64,6 @@ Shader "Hidden/MK/Glow/MKGlowSM25"
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
 
-			#define _MK_PPSV2
 			#define _MK_BLOOM
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
 
@@ -86,7 +83,7 @@ Shader "Hidden/MK/Glow/MKGlowSM25"
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
 
-			#define _MK_PPSV2
+
 			#pragma multi_compile __ _MK_LEGACY_BLIT
 			#pragma multi_compile __ _MK_LENS_SURFACE
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
@@ -108,7 +105,6 @@ Shader "Hidden/MK/Glow/MKGlowSM25"
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
 
-			#define _MK_PPSV2
 
 			#pragma multi_compile __ _MK_LEGACY_BLIT
 			

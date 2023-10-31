@@ -26,7 +26,6 @@ Shader "Hidden/MK/Glow/MKGlowSM45"
 
 			#pragma require mrt8
 
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_BLOOM
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_GLARE_1 _MK_GLARE_2 _MK_GLARE_3 _MK_GLARE_4
@@ -52,7 +51,6 @@ Shader "Hidden/MK/Glow/MKGlowSM45"
 
 			#pragma require mrt8
 
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_BLOOM
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_GLARE_1 _MK_GLARE_2 _MK_GLARE_3 _MK_GLARE_4
@@ -76,7 +74,6 @@ Shader "Hidden/MK/Glow/MKGlowSM45"
 
 			#pragma require mrt8
 
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_BLOOM
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_GLARE_1 _MK_GLARE_2 _MK_GLARE_3 _MK_GLARE_4
@@ -98,12 +95,10 @@ Shader "Hidden/MK/Glow/MKGlowSM45"
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
 
-			#define _MK_PPSV2
-
 			#pragma multi_compile __ _MK_LEGACY_BLIT
 
 			#pragma require mrt8
-			
+
 			#pragma multi_compile __ _MK_LENS_SURFACE
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_GLARE_1 _MK_GLARE_2 _MK_GLARE_3 _MK_GLARE_4
@@ -125,8 +120,6 @@ Shader "Hidden/MK/Glow/MKGlowSM45"
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma fragmentoption ARB_precision_hint_fastest
-
-			#define _MK_PPSV2
 
 			#pragma multi_compile __ _MK_LEGACY_BLIT
 			

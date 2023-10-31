@@ -86,3 +86,10 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90204
+  packageName: MK Glow - Bloom & Lens & Glare
+  packageVersion: 4.6.4
+  assetPath: Assets/_MK/MKGlow/Builtin/LensFlareRamp/LensFlareRamp1.png
+  uploadId: 617418

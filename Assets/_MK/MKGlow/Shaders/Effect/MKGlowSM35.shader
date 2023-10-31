@@ -26,7 +26,6 @@ Shader "Hidden/MK/Glow/MKGlowSM35"
 
 			#pragma require mrt4
 
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_BLOOM
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
@@ -51,7 +50,6 @@ Shader "Hidden/MK/Glow/MKGlowSM35"
 
 			#pragma require mrt4
 			
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_BLOOM
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
@@ -74,7 +72,6 @@ Shader "Hidden/MK/Glow/MKGlowSM35"
 
 			#pragma require mrt4
 
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_BLOOM
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
@@ -99,7 +96,6 @@ Shader "Hidden/MK/Glow/MKGlowSM35"
 
 			#pragma require mrt4
 
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_LENS_SURFACE
 			#pragma multi_compile __ _MK_LENS_FLARE
 			#pragma multi_compile __ _MK_RENDER_PRIORITY_BALANCED _MK_RENDER_PRIORITY_QUALITY
@@ -125,7 +121,6 @@ Shader "Hidden/MK/Glow/MKGlowSM35"
 
 			#pragma require mrt4
 			
-			#define _MK_PPSV2
 			#pragma multi_compile __ _MK_DEBUG_RAW_BLOOM _MK_DEBUG_RAW_LENS_FLARE _MK_DEBUG_LENS_FLARE _MK_DEBUG_COMPOSITE
 			#pragma multi_compile __ _MK_LENS_SURFACE
 			#pragma multi_compile __ _MK_LENS_FLARE

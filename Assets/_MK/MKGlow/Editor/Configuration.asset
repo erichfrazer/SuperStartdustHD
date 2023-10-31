@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c9baea14160014989b649a6e886278, type: 3}
   m_Name: Configuration
   m_EditorClassIdentifier: 
-  _renderPipeline: 1
+  _renderPipeline: 2
   showInstallerOnReload: 0
   _titleImage: {fileID: 2800000, guid: 4f6068e89df94c2438a76e04d4414901, type: 3}
   _readMe: {fileID: 102900000, guid: 54212419df001964ba66346ca6cafece, type: 3}
