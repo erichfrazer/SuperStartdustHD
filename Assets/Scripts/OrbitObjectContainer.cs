@@ -42,6 +42,7 @@ public class OrbitThing : MonoBehaviour
 
         Vector3 newPos = m_pRB.position;
         Quaternion newRot = m_pRB.rotation;
+        Vector3 vVel = m_pRB.velocity;
         float fDistance = newPos.magnitude;
         bool bAdjust = false;
 
@@ -50,7 +51,6 @@ public class OrbitThing : MonoBehaviour
             // keep it in orbit, fixed distance. I'm assuming this doesn't change velocity
             newPos *= OrbitRadius / fDistance;
             Vector3 awayFromPlanetUnitVector = m_pRB.position.normalized;
-            Vector3 vVel = m_pRB.velocity;
 
             // get the velocity in the planet direction and cancel it
             float fPriorVelTowardsPlanet = Vector3.Dot(awayFromPlanetUnitVector, vVel);
@@ -64,8 +64,15 @@ public class OrbitThing : MonoBehaviour
             // bring it back into orbit
             if (fDistance > OrbitRadius)
             {
-                float fNewDistance = fDistance / 1.005f;
-                newPos *= fNewDistance / fDistance;
+                float fMag1 = newPos.magnitude;
+                float fMag2 = ( newPos + vVel * 0.01f ).magnitude;
+                if (fMag2 > fMag1)
+                {
+                    m_pRB.velocity = Vector3.zero;
+                }
+
+                float fNewDistance = fDistance - 0.1f;
+                newPos = newPos.normalized * fNewDistance;
                 bAdjust = true;
 
                 if (fNewDistance <= 4.0f)

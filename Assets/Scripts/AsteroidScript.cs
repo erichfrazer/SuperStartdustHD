@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,9 @@ public class AsteroidScript : OrbitThing
     float m_fStartTime;
     float m_fAliveTime;
     float m_fFadeInTime = 2;
+    internal int m_nAsteroidSize; // starts at 8, 4, 2, 1
+    internal WeaponType m_nAsteroidType;
+    internal bool m_bBonus;
 
     // Use this for initialization
     override internal void Start ()
@@ -71,46 +75,104 @@ public class AsteroidScript : OrbitThing
 
     void BulletHitUs(Collision collision)
     {
-        if ( name.StartsWith( "Ateroid_White1") )
+        if (!m_bInOrbit)
         {
-            GameObject pNewMedAsteroid = Instantiate(
-                GameControllerScript.Singleton.m_pAsteroidType1_Med,
-                transform.position,
-                UnityEngine.Random.rotation,
-                transform.parent.transform
-            );
-
-            AsteroidScript pScript = pNewMedAsteroid.AddComponent<AsteroidScript>();
-
-            GameObject pNewMedAsteroid2 = Instantiate(
-                GameControllerScript.Singleton.m_pAsteroidType1_Med,
-                transform.position,
-                UnityEngine.Random.rotation,
-                transform.parent.transform
-            );
-
-            AsteroidScript pScript2 = pNewMedAsteroid2.AddComponent<AsteroidScript>();
+            m_bInOrbit = true;
         }
 
-        if (name.StartsWith("Ateroid_White2"))
+        AudioClip ac = GameControllerScript.Singleton.m_pAsteroidExplodeSound;
+
+        if (m_nAsteroidType == WeaponType.GoldMelter)
         {
-            GameObject pNewAsteroid = Instantiate(
-                GameControllerScript.Singleton.m_pAsteroidType1_Small, // original
-                transform.position,
-                UnityEngine.Random.rotation,
-                transform.parent.transform
+            if (m_nAsteroidSize == 8)
+            {
+                GameObject pAsteroid1 = Instantiate(
+                    GameControllerScript.Singleton.m_pAsteroidType1_BigMed,
+                    transform.position,
+                    UnityEngine.Random.rotation,
+                    transform.parent.transform
                 );
 
-            AsteroidScript pScript = pNewAsteroid.AddComponent<AsteroidScript>();
+                AsteroidScript pScript = pAsteroid1.AddComponent<AsteroidScript>();
+                pScript.m_nAsteroidSize = 4;
 
-            GameObject pNewAsteroid2 = Instantiate(
-                GameControllerScript.Singleton.m_pAsteroidType1_Small,
-                transform.position,
-                UnityEngine.Random.rotation,
-                transform.parent.transform
+                GameObject pAsteroid2 = Instantiate(
+                    GameControllerScript.Singleton.m_pAsteroidType1_BigMed,
+                    transform.position,
+                    UnityEngine.Random.rotation,
+                    transform.parent.transform
                 );
 
-            AsteroidScript pScript2 = pNewAsteroid2.AddComponent<AsteroidScript>();
+                AsteroidScript pScript2 = pAsteroid2.AddComponent<AsteroidScript>();
+                pScript2.m_nAsteroidSize = 4;
+            }
+            else if (m_nAsteroidSize == 4)
+            {
+                GameObject pAsteroid1 = Instantiate(
+                    GameControllerScript.Singleton.m_pAsteroidType1_Med,
+                    transform.position,
+                    UnityEngine.Random.rotation,
+                    transform.parent.transform
+                    );
+
+                AsteroidScript pScript = pAsteroid1.AddComponent<AsteroidScript>();
+                pScript.m_nAsteroidSize = 2;
+
+                GameObject pAsteroid2 = Instantiate(
+                    GameControllerScript.Singleton.m_pAsteroidType1_Med,
+                    transform.position,
+                    UnityEngine.Random.rotation,
+                    transform.parent.transform
+                    );
+
+                AsteroidScript pScript2 = pAsteroid2.AddComponent<AsteroidScript>();
+                pScript2.m_nAsteroidSize = 2;
+            }
+            else if (m_nAsteroidSize == 2)
+            {
+                GameObject pAsteroid1 = Instantiate(
+                    GameControllerScript.Singleton.m_pAsteroidType1_Small,
+                    transform.position,
+                    UnityEngine.Random.rotation,
+                    transform.parent.transform
+                    );
+
+                AsteroidScript pScript = pAsteroid1.AddComponent<AsteroidScript>();
+                pScript.m_nAsteroidSize = 1;
+
+                int r = (int) UnityEngine.Random.Range(1, 10);
+                if (r == 1)
+                {
+                    GameObject pAsteroid2 = Instantiate(
+                        GameControllerScript.Singleton.m_pBonusAsteroid,
+                        transform.position,
+                        UnityEngine.Random.rotation,
+                        transform.parent.transform
+                        );
+
+                    AsteroidScript pScript2 = pAsteroid2.AddComponent<AsteroidScript>();
+                    pScript2.m_nAsteroidSize = 1;
+                    pScript2.m_bBonus = true;
+
+                    ac = GameControllerScript.Singleton.m_pBonusAsteroidExplodeSound;
+                }
+                else
+                {
+                    GameObject pAsteroid2 = Instantiate(
+                        GameControllerScript.Singleton.m_pAsteroidType1_Small,
+                        transform.position,
+                        UnityEngine.Random.rotation,
+                        transform.parent.transform
+                        );
+
+                    AsteroidScript pScript2 = pAsteroid2.AddComponent<AsteroidScript>();
+                    pScript2.m_nAsteroidSize = 1;
+                }
+            }
+            else
+            {
+                // just die
+            }
         }
 
         GameObject pNewExplosion = Instantiate(
@@ -126,6 +188,7 @@ public class AsteroidScript : OrbitThing
         pExplosionParticleSystem.Play();
 
         AudioSource pAudio = GameControllerScript.Singleton.gameObject.GetComponent<AudioSource>();
+        pAudio.clip = ac;
         pAudio.Play();
 
         Destroy(this.gameObject);

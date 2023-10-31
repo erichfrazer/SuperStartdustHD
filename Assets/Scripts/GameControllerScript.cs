@@ -5,11 +5,16 @@ using UnityEngine;
 public class GameControllerScript : MonoBehaviour {
 
     public GameObject m_pAsteroidType1_Big;
+    public GameObject m_pAsteroidType1_BigMed;
     public GameObject m_pAsteroidType1_Med;
     public GameObject m_pAsteroidType1_Small;
     public GameObject m_pAsteroidExplosion;
+    public GameObject m_pBonusAsteroid;
     public GameObject m_pPlanet;
     public GameObject m_pBlueBug;
+    public GameObject m_pBonusPellet;
+    public AudioClip m_pAsteroidExplodeSound;
+    public AudioClip m_pBonusAsteroidExplodeSound;
 
     float m_fUpdateNowTime;
     int m_nWave;
@@ -220,6 +225,8 @@ public class GameControllerScript : MonoBehaviour {
 
         // OrbitObjectContainer pOrbit = pNewBigAsteroid.AddComponent<OrbitObjectContainer>( );
         AsteroidScript pScript = pNewBigAsteroid.AddComponent<AsteroidScript>();
+        pScript.m_nAsteroidSize = 8;
+        pScript.m_nAsteroidType = Assets.Scripts.WeaponType.GoldMelter;
     }
 
     void Update_Wave2( )

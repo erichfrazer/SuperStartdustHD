@@ -16250,14 +16250,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_pAsteroidType1_Big: {fileID: 1155917205701688, guid: 77b5516149bf12b45bc5ba24c23d2eb1,
     type: 3}
-  m_pAsteroidType1_Med: {fileID: 1155917205701688, guid: 9a0353a00062df646b60a4fff8085211,
+  m_pAsteroidType1_BigMed: {fileID: 1155917205701688, guid: 9a0353a00062df646b60a4fff8085211,
     type: 3}
-  m_pAsteroidType1_Small: {fileID: 1074675057422786, guid: a6e67ff6fe17442449588123a91f0352,
+  m_pAsteroidType1_Med: {fileID: 1074675057422786, guid: a6e67ff6fe17442449588123a91f0352,
+    type: 3}
+  m_pAsteroidType1_Small: {fileID: 1979886647182092, guid: 6ce7fdb1c0fa0c449a03dd28908b78d4,
     type: 3}
   m_pAsteroidExplosion: {fileID: 1648151889684314, guid: d8a9d068dcd37e043988a19a2faa7c60,
     type: 3}
+  m_pBonusAsteroid: {fileID: 6029011453102089693, guid: 1d75c430a4698094f985ac0593c2a9b5,
+    type: 3}
   m_pPlanet: {fileID: 1452451793}
   m_pBlueBug: {fileID: 1739819066627492, guid: 7b8f7b8c3c43c324daa70db7ec06d33f, type: 3}
+  m_pBonusPellet: {fileID: 0}
+  m_pAsteroidExplodeSound: {fileID: 8300000, guid: c7865fd595be8a046a018f3e24771dd6,
+    type: 3}
+  m_pBonusAsteroidExplodeSound: {fileID: 8300000, guid: 32a085624b9f652458773be29e8fc6c1,
+    type: 3}
 --- !u!4 &1569215229
 Transform:
   m_ObjectHideFlags: 0
