@@ -1,9 +1,15 @@
 fileFormatVersion: 2
 guid: 9495c0e0a6314994d9bafd4aab0a8288
-timeCreated: 18446744011573954816
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16190
+  packageName: Modular Space Raider
+  packageVersion: 1.1 April 2014
+  assetPath: Assets/Modular Space Raider/Prefabs - parts/Weapon.prefab
+  uploadId: 0

@@ -1,8 +1,14 @@
 fileFormatVersion: 2
 guid: 6268dbc2b29d1b1459495179ab5268d1
-timeCreated: 18446744011573954816
 TextScriptImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16190
+  packageName: Modular Space Raider
+  packageVersion: 1.1 April 2014
+  assetPath: Assets/Modular Space Raider/Shader/how_to_use.txt
+  uploadId: 0

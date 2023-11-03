@@ -1,8 +1,14 @@
 fileFormatVersion: 2
 guid: 24e151b2b19c6a9419ee16deaf8aa53b
-timeCreated: 18446744011573954816
 TextScriptImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16190
+  packageName: Modular Space Raider
+  packageVersion: 1.1 April 2014
+  assetPath: Assets/Modular Space Raider/readme.txt
+  uploadId: 0

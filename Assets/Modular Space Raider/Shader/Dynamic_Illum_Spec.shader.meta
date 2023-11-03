@@ -1,9 +1,16 @@
 fileFormatVersion: 2
 guid: bd3cb093f7fdf024e8d45cb7667cd55d
-timeCreated: 18446744011573954816
 ShaderImporter:
   externalObjects: {}
   defaultTextures: []
+  nonModifiableTextures: []
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16190
+  packageName: Modular Space Raider
+  packageVersion: 1.1 April 2014
+  assetPath: Assets/Modular Space Raider/Shader/Dynamic_Illum_Spec.shader
+  uploadId: 0

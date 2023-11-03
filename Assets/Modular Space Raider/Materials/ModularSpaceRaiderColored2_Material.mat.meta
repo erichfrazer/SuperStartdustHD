@@ -1,9 +1,15 @@
 fileFormatVersion: 2
 guid: 047f90eaed4a0c4408c70270c6e993f4
-timeCreated: 18446744011573954816
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16190
+  packageName: Modular Space Raider
+  packageVersion: 1.1 April 2014
+  assetPath: Assets/Modular Space Raider/Materials/ModularSpaceRaiderColored2_Material.mat
+  uploadId: 0

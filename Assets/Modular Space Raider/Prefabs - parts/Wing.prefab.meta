@@ -1,9 +1,15 @@
 fileFormatVersion: 2
 guid: e433576f708a36f40a657d254ef2559d
-timeCreated: 18446744011573954816
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16190
+  packageName: Modular Space Raider
+  packageVersion: 1.1 April 2014
+  assetPath: Assets/Modular Space Raider/Prefabs - parts/Wing.prefab
+  uploadId: 0
