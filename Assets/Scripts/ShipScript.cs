@@ -35,6 +35,8 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
     public AudioClip m_pThrustSound;
     public AudioClip m_pFastLaserSound;
     public AudioClip m_pChangeWeaponSound;
+    public AudioClip m_pLostShieldSound;
+    public AudioClip m_pSomethingHitShipSound;
 
     public GameObject m_pGoldMelter_Prefab;
     public GameObject m_pRockBuster_Prefab;
@@ -423,18 +425,46 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
 
     private void OnCollisionEnter(Collision collision)
     {
-        ICollisionPower icp = collision as ICollisionPower;
+        ICollisionPower icp = collision.gameObject.GetComponent<ICollisionPower>();
         if (icp == null)
         {
             return;
         }
 
         float pwr = icp.GetCollisionPower();
+
+        if (m_nShieldStrength > 0)
+        {
+            m_nShieldStrength -= pwr;
+            // update UI
+            GameControllerScript.Singleton.m_Canvas.SetShieldLevel(true, m_nShieldStrength);
+
+            if (m_nShieldStrength <= 0)
+            {
+                m_pAudioSource.clip = m_pLostShieldSound;
+                m_pAudioSource.Play();
+                ShieldObject.SetActive(false);
+            }
+            else
+            {
+                m_pAudioSource.clip = m_pSomethingHitShipSound;
+                m_pAudioSource.Play();
+            }
+
+            return;
+        }
+
         m_nHullStrength -= pwr;
         if (pwr <= 0)
         {
             // kill us
         }
+
+        m_pAudioSource.clip = m_pSomethingHitShipSound;
+        m_pAudioSource.Play();
+
+        // update UI
+        GameControllerScript.Singleton.m_Canvas.SetShieldLevel(false, m_nHullStrength);
     }
 
     GameObject ShieldObject
@@ -443,26 +473,5 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         {
             return transform.Find("shield").gameObject;
         }
-    }
-
-    internal void OnShieldCollisionEnter(Collision collision)
-    {
-        // what hit us and how powerful is it?
-        ICollisionPower icp = collision as ICollisionPower;
-        if( icp == null )
-        {
-            return;
-        }
-
-        float pwr = icp.GetCollisionPower();
-        m_nShieldStrength -= pwr;
-        if (m_nShieldStrength <= 0)
-        {
-            ShieldObject.SetActive(false);
-        }
-
-        // update UI
-        GameControllerScript.Singleton.m_Canvas.SetShieldLevel(m_nShieldStrength);
-
     }
 }

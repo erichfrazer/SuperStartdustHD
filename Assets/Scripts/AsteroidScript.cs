@@ -19,7 +19,7 @@ public class AsteroidScript : OrbitThing, ICollisionPower
         set
         {
             _AsteroidSize = value;
-            m_fAsteroidStrength = _AsteroidSize * 10;
+            m_fAsteroidStrength = _AsteroidSize * 4;
         }
     }
 
@@ -96,15 +96,14 @@ public class AsteroidScript : OrbitThing, ICollisionPower
 
         AudioClip ac = GameControllerScript.Singleton.m_pAsteroidExplodeSound;
 
-        BulletScript bs = collision.gameObject.transform.parent.GetComponent<BulletScript>();
-        ICollisionPower icp = bs as ICollisionPower;
+        ICollisionPower icp = collision.gameObject.GetComponentInParent<ICollisionPower>();
         float pwr = icp.GetCollisionPower();
         m_fAsteroidStrength -= pwr;
         if (m_fAsteroidStrength > 0)
         {
             // keep on going. Add the bullet's velocity to our own?
             Vector3 mv = icp.GetMomentum();
-            m_pRB.AddForce(mv, ForceMode.Impulse);
+            // m_pRB.AddForce(mv, ForceMode.Impulse);
 
 
         }

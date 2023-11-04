@@ -20,10 +20,17 @@ public class CanvasScript : MonoBehaviour
         
     }
 
-    public void SetShieldLevel(float fLevel)
+    public void SetShieldLevel(bool bIsShield, float fLevel)
     {
-        TMP_Text t = ShieldText.GetComponent<TMP_Text>();
-        t.text = "SHIELD LEVEL: " + fLevel;
+        UnityEngine.UI.Text t = ShieldText.GetComponent<UnityEngine.UI.Text>();
+        if (bIsShield)
+        {
+            t.text = "SHIELD LEVEL: " + fLevel;
+        }
+        else
+        {
+            t.text = "HULL LEVEL: " + fLevel;
+        }
     }
 
     public void SetScore(int Score)

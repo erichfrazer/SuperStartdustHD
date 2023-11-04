@@ -20,6 +20,6 @@ public class ShieldScript : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        theShip.OnShieldCollisionEnter(collision);
+       
     }
 }
