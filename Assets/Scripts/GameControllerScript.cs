@@ -15,6 +15,7 @@ public class GameControllerScript : MonoBehaviour {
     public GameObject m_pBonusPellet;
     public AudioClip m_pAsteroidExplodeSound;
     public AudioClip m_pBonusAsteroidExplodeSound;
+    public CanvasScript m_Canvas;
 
     float m_fUpdateNowTime;
     int m_nWave;
@@ -225,7 +226,7 @@ public class GameControllerScript : MonoBehaviour {
 
         // OrbitObjectContainer pOrbit = pNewBigAsteroid.AddComponent<OrbitObjectContainer>( );
         AsteroidScript pScript = pNewBigAsteroid.AddComponent<AsteroidScript>();
-        pScript.m_nAsteroidSize = 8;
+        pScript.AsteroidSize = 8;
         pScript.m_nAsteroidType = Assets.Scripts.WeaponType.GoldMelter;
     }
 

@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlueBugScript : MonoBehaviour
+public class BlueBugScript : MonoBehaviour, ICollisionPower
 {
     public GameObject m_pShadowObject;
     public AudioClip m_pExplosionSound;
@@ -11,6 +12,7 @@ public class BlueBugScript : MonoBehaviour
     float m_fAliveTime;
     float m_fFadeInTime = 2;
     public GameControllerScript m_pGameControllerScript;
+    Rigidbody m_pRB;
 
     public static List<GameObject> BlueBugList = new List<GameObject>( );
 
@@ -19,6 +21,7 @@ public class BlueBugScript : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        m_pRB = GetComponent<Rigidbody>();
         BoidBehaviour bb = GetComponent<BoidBehaviour>();
         m_pOrbitThing = bb as OrbitThing;
 
@@ -139,5 +142,15 @@ public class BlueBugScript : MonoBehaviour
 
         Destroy( this.gameObject );
         Destroy( collision.gameObject );
+    }
+
+    public float GetCollisionPower()
+    {
+        return m_pRB.mass * m_pRB.velocity.magnitude * 1 * 100;
+    }
+
+    public UnityEngine.Vector3 GetMomentum()
+    {
+        return m_pRB.mass * m_pRB.velocity;
     }
 }

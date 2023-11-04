@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletScript : MonoBehaviour
+public class BulletScript : MonoBehaviour, ICollisionPower
 {
     Vector3 m_pLastPos;
     float m_fTravelDist = 0;
@@ -127,5 +127,15 @@ public class BulletScript : MonoBehaviour
     void DestroyMe()
     {
         Destroy(gameObject);
+    }
+
+    public float GetCollisionPower()
+    {
+        return m_pRB.mass * m_pRB.velocity.magnitude;
+    }
+
+    public Vector3 GetMomentum()
+    {
+        return m_pRB.mass * m_pRB.velocity;
     }
 }

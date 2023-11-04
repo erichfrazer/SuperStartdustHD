@@ -41,6 +41,9 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
     public GameObject m_pIceBlaster_Prefab;
     public GameObject m_pLight;
 
+    internal float m_nShieldStrength = 1000;
+    internal float m_nHullStrength = 1000;
+
     float m_fLastTimeThrustPlayed;
     AudioSource m_pAudioSource;
     float m_fJoystickXAxis;
@@ -418,4 +421,48 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        ICollisionPower icp = collision as ICollisionPower;
+        if (icp == null)
+        {
+            return;
+        }
+
+        float pwr = icp.GetCollisionPower();
+        m_nHullStrength -= pwr;
+        if (pwr <= 0)
+        {
+            // kill us
+        }
+    }
+
+    GameObject ShieldObject
+    {
+        get
+        {
+            return transform.Find("shield").gameObject;
+        }
+    }
+
+    internal void OnShieldCollisionEnter(Collision collision)
+    {
+        // what hit us and how powerful is it?
+        ICollisionPower icp = collision as ICollisionPower;
+        if( icp == null )
+        {
+            return;
+        }
+
+        float pwr = icp.GetCollisionPower();
+        m_nShieldStrength -= pwr;
+        if (m_nShieldStrength <= 0)
+        {
+            ShieldObject.SetActive(false);
+        }
+
+        // update UI
+        GameControllerScript.Singleton.m_Canvas.SetShieldLevel(m_nShieldStrength);
+
+    }
 }

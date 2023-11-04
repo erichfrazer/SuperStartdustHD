@@ -83,9 +83,9 @@ namespace MK.Glow.Example
 
         private void OnCollisionEnter(Collision collision)
         {
-            ContactPoint contact = collision.contacts[0];
-            Vector3 reflectedVelocity = Vector3.Reflect(_rigidBody.velocity, contact.normal).normalized;       
-            _rigidBody.velocity = reflectedVelocity;
+            // ContactPoint contact = collision.contacts[0];
+            // Vector3 reflectedVelocity = Vector3.Reflect(_rigidBody.velocity, contact.normal).normalized;       
+            // _rigidBody.velocity = reflectedVelocity;
         }
     }
 }
