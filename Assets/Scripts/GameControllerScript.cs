@@ -232,6 +232,8 @@ public class GameControllerScript : MonoBehaviour {
 
     void Update_Wave2( )
     {
+        return;
+
         if( m_nAliensCreatedWave2 >= m_nAliensToCreateWave2 )
         {
             return;

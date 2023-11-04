@@ -444,6 +444,9 @@ public class ShipScript : MonoBehaviour, InputActions.IGameplayActions
                 m_pAudioSource.clip = m_pLostShieldSound;
                 m_pAudioSource.Play();
                 ShieldObject.SetActive(false);
+                Collider shipCollider = GetComponent<Collider>();
+                shipCollider.enabled = false;
+                shipCollider.enabled = true;
             }
             else
             {

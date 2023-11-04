@@ -10,6 +10,7 @@ public class AsteroidScript : OrbitThing, ICollisionPower
     float m_fAliveTime;
     float m_fFadeInTime = 2;
     internal WeaponType m_nAsteroidType;
+
     internal int AsteroidSize
     {
         get
@@ -26,6 +27,7 @@ public class AsteroidScript : OrbitThing, ICollisionPower
     internal bool m_bBonus;
     private int _AsteroidSize;
     internal float m_fAsteroidStrength;
+    Collider m_Collider;
 
     // Use this for initialization
     override internal void Start ()
@@ -36,6 +38,10 @@ public class AsteroidScript : OrbitThing, ICollisionPower
 
         // since we attach the script at runtime, we can't trap this
         m_fStartTime = Time.time;
+
+        m_Collider = GetComponent<Collider>();
+        m_Collider.enabled = false;
+
     }
 
     private void M_pParentOrbit_ReachedOrbit( object sender, System.EventArgs e )
@@ -56,6 +62,13 @@ public class AsteroidScript : OrbitThing, ICollisionPower
         base.FixedUpdate();
 
         m_fAliveTime = Time.time - m_fStartTime;
+        if (m_fAliveTime > 0.25f)
+        {
+            if( !m_Collider.enabled )
+            {
+                m_Collider.enabled = true;
+            }
+        }
 
         if( !InOrbit )
         {
@@ -83,11 +96,15 @@ public class AsteroidScript : OrbitThing, ICollisionPower
         GameObject pHit = collision.gameObject;
         if (pHit.layer == 6 )
         {
-            BulletHitUs(collision);
+            SomethingHitUs(false, collision);
+        }
+        if (pHit.layer == 10)
+        {
+            SomethingHitUs(true, collision);
         }
     }
 
-    void BulletHitUs(Collision collision)
+    void SomethingHitUs(bool bTotalDestruction, Collision collision)
     {
         if (!m_bInOrbit)
         {
@@ -97,7 +114,22 @@ public class AsteroidScript : OrbitThing, ICollisionPower
         AudioClip ac = GameControllerScript.Singleton.m_pAsteroidExplodeSound;
 
         ICollisionPower icp = collision.gameObject.GetComponentInParent<ICollisionPower>();
+        if (icp == null)
+        {
+            icp = collision.gameObject.GetComponent<ICollisionPower>( );
+        }
+        if( icp == null )
+        {
+            int stop = 0;
+            return;
+        }
+
         float pwr = icp.GetCollisionPower();
+        if( bTotalDestruction )
+        {
+            pwr = m_fAsteroidStrength;
+        }
+
         m_fAsteroidStrength -= pwr;
         if (m_fAsteroidStrength > 0)
         {
