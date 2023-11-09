@@ -45,8 +45,10 @@ public class BoidBehaviour : OrbitThing
         return diff * (scaler / diffLen);
     }
 
-    void Start()
+    internal override void Start()
     {
+        base.Start();
+
         controller = GameControllerScript.Singleton;
         m_pShip = ShipScript.Singleton.gameObject;
 

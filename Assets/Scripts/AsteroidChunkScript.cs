@@ -13,7 +13,7 @@ public class AsteroidChunkScript : MonoBehaviour
     void Start()
     {
         m_fStartTime = Time.time;
-        // m_Material = GetComponent<MeshRenderer>().material;
+        m_Material = GetComponent<MeshRenderer>().material;
     }
 
     // Update is called once per frame
@@ -22,7 +22,7 @@ public class AsteroidChunkScript : MonoBehaviour
         float fDelta = Time.time - m_fStartTime;
         if (fDelta >= m_fLiveTime)
         {
-            Destroy(gameObject);
+            // Destroy(gameObject);
             return;
         }
         if (m_Material != null)

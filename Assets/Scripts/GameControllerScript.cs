@@ -215,7 +215,7 @@ public class GameControllerScript : MonoBehaviour {
 
         GameObject pNewBigAsteroid = Instantiate(
                 m_pAsteroidType1_Big,
-                Random.onUnitSphere * 20,
+                Random.onUnitSphere * 10,
                 Random.rotation,
                 TheSystemScript.Singleton.transform );
 
